@@ -3,6 +3,7 @@ package psl.survivor.proc;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import psl.survivor.net.*;
 import psl.survivor.util.*;
 
 public class TaskProcessorHandle {
@@ -19,7 +20,7 @@ public class TaskProcessorHandle {
 	_name = tptc.getName();
 	_hostname = tptc.getHostName();
 	_port = tptc.getPort();
-	_capabilities = tptc.getCapabilities;
+	_capabilities = tptc.getCapabilities();
     }
 
     public boolean valid() {

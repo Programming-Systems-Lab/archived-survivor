@@ -65,12 +65,16 @@ public class CloudNode implements Runnable {
 
   private static final String GENERAL_MESSAGE = "GENERAL MESSAGE";
 
-    public CloudNode(String peer, TPTransportContainer tptc,
-		     MessageHandler mh) {
-	//GAURAV
-	// can you add this constructor above, thanks
-	this (null, null, 0, null, null, null, null);
-    }
+  public CloudNode(String peerURL, TPTransportContainer tptc,
+         MessageHandler mh) {
+    //GAURAV
+    // can you add this constructor above, thanks
+    // this (null, null, 0, null, null, null, null);
+
+    // jeandenis
+    // is this what you mean?
+    this(null, null, 0, peerURL, null, tptc, mh);
+  }
   
   public CloudNode(String host, String name, int port,
                     String peerURL,
