@@ -187,8 +187,10 @@ public class Replicator implements Runnable {
 	    } else {
 		for (int i = 0; i < al.size(); i++) {
 		    TaskProcessorHandle tph = (TaskProcessorHandle) al.get(i);
-		    if (tph.valid(_processor)) {
-
+		    if ((tph.valid(_processor)) &&
+			!tph.getName().equals
+			(((TaskProcessorHandle)v.data()).getName())) {
+		    
 			// if the processor is up, let's have it execute
 			final TaskProcessorHandle tph2 = tph;
 			Thread t = new Thread() {
