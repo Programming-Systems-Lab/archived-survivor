@@ -110,6 +110,7 @@ public final class NPortal {
                       long lastSet = new Date().getTime();
                       long currTime;
                       public void paint(Graphics g) {
+                        super.paint(g);
                         currTime = new Date().getTime();
                         if (Math.abs(getDividerLocation() - lastLoc) >= 0.05) { 
                           setDividerLocation(0.5);
@@ -119,7 +120,6 @@ public final class NPortal {
                           setDividerLocation(0.5);
                           lastSet = currTime;
                         }
-                        super.paint(g);
                       }
                     }, 
                  "Information on executing tasks");
@@ -420,6 +420,7 @@ public final class NPortal {
       DisplayItem di = DisplayItem.createInstance(v, taskName(v), "");
       if (di == null) return;
       _taskListModel.addElement(di);
+      _taskList.validate(); _taskList.repaint();
     }
     
     /**
@@ -429,6 +430,7 @@ public final class NPortal {
       DisplayItem di = DisplayItem.instance(v);
       if (di == null) return;
       di.exited();
+      _taskList.validate(); _taskList.repaint();
     }
     
     /**
@@ -438,6 +440,7 @@ public final class NPortal {
       DisplayItem di = DisplayItem.instance(v);
       if (di == null) return;
       di.toKill();
+      _taskList.validate(); _taskList.repaint();
     }
     
     /**
@@ -448,6 +451,7 @@ public final class NPortal {
       DisplayItem di = DisplayItem.instance(v);
       if (di == null) return;
       di.killed();
+      _taskList.validate(); _taskList.repaint();
     }
     
     /**
@@ -459,6 +463,7 @@ public final class NPortal {
       if (di == null) return;
       di.replActive();
       _replListModel.addElement(di);
+      _replList.validate(); _replList.repaint();
     }
     
     /**
@@ -468,6 +473,7 @@ public final class NPortal {
     public void doneReplicatingTask(Version v) {
       DisplayItem di = DisplayItem.instance(v);
       di.replExited();
+      _replList.validate(); _replList.repaint();
     }
     
     /**
@@ -478,6 +484,7 @@ public final class NPortal {
       DisplayItem di = DisplayItem.instance(v);
       if (di == null) return;
       di.replProcDown();
+      _replList.validate(); _replList.repaint();
     }
     
     /**
@@ -489,6 +496,7 @@ public final class NPortal {
       DisplayItem di = DisplayItem.instance(v);
       if (di == null) return;
       di.replTimedOut();
+      _replList.validate(); _replList.repaint();
     }  
 
     // processor capabilities
