@@ -20,6 +20,8 @@ public class Processor implements Runnable {
     protected ArrayList _capabilities;
     protected WorkflowData _workflowData;
     private MessageHandler _messageHandler;
+    protected Replicator _replicator = null;
+    protected boolean _hasReplicator = false;
 
     private int _SLEEP_TIME = 500;
     private int _SLEEP_TIME2 = 1000;
@@ -47,8 +49,6 @@ public class Processor implements Runnable {
 
 	_workflowData = new WorkflowData(_wfDefPath);
 
-	TaskProcessorHandle tph = new TaskProcessorHandle(this);
-       	addProcessor(tph);
     }
 
     public void setMessageHandler(MessageHandler mh) { _messageHandler = mh; }
@@ -65,6 +65,28 @@ public class Processor implements Runnable {
 	return new TaskProcessorHandle(this);
     }
 
+    public void addMainReplicator(Replicator r) {
+	_replicator = r;
+	_hasReplicator = true;
+	r.setPoolData(_poolData);
+	r.setVersionCache(_versionCache);
+	
+	// THE FOLLOWING TWO LINES USED TO BE IN THE CONSTRUCTOR
+	// THE PROBLEM IS THAT WE CAN'T DO THIS UNTIL WE KNOW ABOUT 
+	// THE REPLICATING CAPABILITIES OF THE PROCESSOR
+	TaskProcessorHandle tph = new TaskProcessorHandle(this);
+       	addProcessor(tph);
+    }
+
+    public boolean hasMainReplicator() { return _hasReplicator; }
+    public Replicator getMainReplicator() { return _replicator; }
+
+    public void addReplicator(ReplicatorHandle rh) {
+	synchronized(_replicatorQueue) {
+	    _replicatorQueue.add(rh);
+	}
+    }
+
     public void addCapability(Object o) {
 	if (!_capabilities.contains(o)) {
 	    _capabilities.add(o);
@@ -75,9 +97,18 @@ public class Processor implements Runnable {
 	return _capabilities;
     }
 
+    public Vector getReplicators() { return _replicatorQueue; }
+
 
     public void addProcessor(TaskProcessorHandle tph) {
 	_poolData.addProcessor(tph);
+	if (tph.hasMainReplicator()) {
+	    System.out.println("WE ARE ADDING A REPLICATOR HERE: " + tph);
+	    ReplicatorHandle rh = tph.getReplicatorHandle();
+	    if (!rh.getName().equals(_replicator.getName())) {
+		addReplicator(rh);
+	    }
+	}
     }
 
     public void addPool(ArrayList al) {
@@ -110,9 +141,10 @@ public class Processor implements Runnable {
     public void executeTask(Version theTask) {
 
         System.out.println(" - - - - - - - - - - - PSL! entered executeTask, parameter version>  " + theTask);
-	if (_versionCache.contains(theTask)) return;
+	// if (_versionCache.contains(theTask)) return;
 
 	_versionCache.addVersion(theTask);
+	replicate(theTask);
 
 	alertReplicatorsExecutingTask(theTask);
 
@@ -121,16 +153,19 @@ public class Processor implements Runnable {
 	// versioning happens here
 	// TODO remove nonsense hereunder
 	if (nextTask == null) {
-	    if (psl.survivor.ProcessorMain.debug) System.out.println("%%%%%%%%%%%%%%BAD");
+	    System.out.println("WORKFLOW IS DONE");
+	    alertReplicatorsDoneExecutingTask(theTask);
+	} else {
+	    nextTask.append(taskName);
+	    
+	    // todo: 16-Feb maybe uncomment this?? _versionCache.addVersion(nextTask);
+	    
+	    queueTask(nextTask);
+	    
+	    System.out.println("WE DO NOT GET HERE");
+	    
+	    alertReplicatorsDoneExecutingTask(theTask);
 	}
-	nextTask.append(taskName);
-
-	// todo: 16-Feb maybe uncomment this?? _versionCache.addVersion(nextTask);
-
-	replicate(nextTask);
-	queueTask(nextTask);
-
-	alertReplicatorsDoneExecutingTask(theTask);
     }
 
     public void stopTask(Version v) {

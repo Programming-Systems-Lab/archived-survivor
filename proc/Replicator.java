@@ -3,7 +3,9 @@ import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Date;
+import java.util.Set;
 import psl.survivor.util.*;
 public class Replicator implements Runnable {
     
@@ -12,9 +14,9 @@ public class Replicator implements Runnable {
     private int _SLEEP_TIME = 1000;
     private int _executionThreshold = 1000*60;
     private VersionCache _versionCache;
-    private HashMap _versionLookup;
+    private TreeMap _versionLookup;
     private ArrayList _versions;
-    private HashMap _tasksInProgress;
+    private TreeMap _tasksInProgress;
     private String _name;
     private PoolData _poolData;
     private Processor _processor; 
@@ -24,8 +26,19 @@ public class Replicator implements Runnable {
 	_name = name;
 	_processor = p;
 	_poolData = p.getPoolData();
+	_tasksInProgress = new TreeMap();
+	_versionLookup = new TreeMap();
+	_versions = new ArrayList();
     }
+    public ReplicatorHandle getHandle() {
+	return new ReplicatorHandle(_name, _processor.getHostName(), 
+				    _processor.getPort());
+    }
+    public void setPoolData(PoolData p) { _poolData = p; }
+    public void setVersionCache(VersionCache vc) { _versionCache = vc; }
+    public String getName() { return _name; }
     public void alertExecutingTask(Version v) {
+	System.out.println("***********************(((((((((((())))))))))))) Alert we are executing as task somewhere else");
 	_tasksInProgress.put(v, new Date());
     }
     public void alertDoneExecutingTask(Version v) {
@@ -68,6 +81,7 @@ public class Replicator implements Runnable {
 	synchronized (vec) {
 	    for (int i = 0; i < vec.size(); i++) {
 		ReplicatorHandle rh = (ReplicatorHandle) vec.get(i);
+		System.out.println("DOING THE PING THING: " + rh);
 		if ((maxName.compareTo(rh.getName()) < 0) &&
 		    (rh.ping(_processor))) {
 		    maxName = rh.getName();
@@ -76,6 +90,7 @@ public class Replicator implements Runnable {
 	    }
 	}
 	if (maxName.equals(_name)) {
+	    System.out.println("ABOUT TO EXECUTE");
 	    executeTask(v);
 	}
     }
@@ -130,30 +145,35 @@ public class Replicator implements Runnable {
     public void run() {
 	while (true) {
 	    synchronized (_tasksInProgress) {
-		Iterator it = _tasksInProgress.keySet().iterator();
-		while (it.hasNext()) {
-		    Version v;
-		    TaskProcessorHandle tph = (TaskProcessorHandle)
-			(v = (Version)it.next()).data();
-		    if (!tph.ping(v.split(null), _processor)) {
-			final Version v1 = v;
-			Thread t = new Thread() {
-				public void run() {
-				    survive(v1);
-				}
-			    };
-			t.start();
-		    }
-		    Date d = (Date) _tasksInProgress.get(v);
-		    Date now = new Date();
-		    if ((now.getTime() - _TIME_TO_PROCESS) > d.getTime()) {
-			final Version v1 = v;
-			Thread t = new Thread() {
-				public void run() {
-				    forceSurvive(v1);
-				}
-			    };
-			t.start();
+		Set s = _tasksInProgress.keySet();
+		if (s != null) {
+		    Iterator it = _tasksInProgress.keySet().iterator();
+		    while (it.hasNext()) {
+			Version v;
+			TaskProcessorHandle tph = (TaskProcessorHandle)
+			    (v = (Version)it.next()).data();
+			if (tph == null) { System.out.println("TPH IS NULL"); }
+			if (v.split(null) == null) { System.out.println("v.split is NULL");}
+			if (!tph.ping(v.split(null), _processor)) {
+			    final Version v1 = v;
+			    Thread t = new Thread() {
+				    public void run() {
+					survive(v1);
+				    }
+				};
+			    t.start();
+			}
+			Date d = (Date) _tasksInProgress.get(v);
+			Date now = new Date();
+			if ((now.getTime() - _TIME_TO_PROCESS) > d.getTime()) {
+			    final Version v1 = v;
+			    Thread t = new Thread() {
+				    public void run() {
+					forceSurvive(v1);
+				    }
+				};
+			    t.start();
+			}
 		    }
 		}
 	    }	 

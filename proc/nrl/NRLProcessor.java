@@ -74,6 +74,11 @@ public class NRLProcessor extends Processor {
     while (resultData == null) {
       resultData
         = (NRLProcessData) _resultDataStorage.get(instanceId.toString());
+      try {
+	  Thread.sleep(500);
+      } catch (Exception e) {
+	  ;
+      }
     }
     _resultDataStorage.remove(instanceId.toString());
 
@@ -83,12 +88,17 @@ public class NRLProcessor extends Processor {
       if (psl.survivor.ProcessorMain.debug) System.out.println("resultData is NOT null");
     }
 
+    if (resultData.workflowName.equals("END")) {
+	System.out.println("WE ARE AT THE END");
+	return null;
+    } 
+
     /*    TaskDefinition td = new TaskDefinition(resultData.nextTaskName);
-    td.addRequirement(new NameValuePair(resultData.nextTaskName, "true"));*/
+	  td.addRequirement(new NameValuePair(resultData.nextTaskName, "true"));*/
     TaskDefinition td = _workflowData.getTaskDefinition(resultData.nextTaskName);
-
+    
     Version result = theTask.split2(td, resultData); // ya had these reversed :)
-
+    
     if (psl.survivor.ProcessorMain.debug) if (result == null) System.out.println("|||||||||||\\\\\\ bad");
 
     System.out.println(" - - - - - - - - - - - PSL! executeTaskLocal returning version> " + result);
@@ -202,6 +212,11 @@ public class NRLProcessor extends Processor {
 
               } else {
                 // 2-do: transition to end task
+		  new Exception().printStackTrace(); System.out.println("FUCKA"); System.out.println("FUCKA"); 
+                NRLProcessData resultData = new NRLProcessData();    
+                resultData.workflowName = "END";
+
+		_resultDataStorage.put(instanceId.toString(), resultData);
               }
             }   
           }; // ENDED: Scheduler_Serv

@@ -1,3 +1,9 @@
+- GSKC: stop task
+        shutdown cloud
+
+- JD: need to fix the versioning to have 3 version
+      much other stuff
+
 - JD: get Replicators working by default in the ProcessorMain, fix STOP-TASK
   Gskc: use reflection to obtain processor-TYPE
 

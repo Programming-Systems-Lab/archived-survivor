@@ -35,6 +35,9 @@ public class Realization extends AbstractRealization{
     try{
 
       System.out.println("Running the MIDDLE task");
+      try {
+	  Thread.sleep(2000);
+      } catch (Exception e) {;}
       taskMgr().endTask(null);
     }
     catch(Exception e){

@@ -35,10 +35,11 @@ public class Realization extends AbstractRealization{
     try{
 
       System.out.println("Running the START task");
-      /*      while (true) {
-	  System.out.println("TASK THAT NEVER ENDS");
-	  if (false) break;
-	  }*/
+      try {
+      Thread.sleep(5000);
+      } catch (Exception e) {
+      }
+      System.out.println("DONE");
       taskMgr().endTask(null);
     }
     catch(Exception e){

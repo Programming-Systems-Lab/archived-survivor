@@ -15,6 +15,7 @@ public class TaskProcessorHandle implements Serializable {
     private String _hostname;
     private int _port;
     private ArrayList _capabilities;
+    private ReplicatorHandle _rh = null;
 
     /**
      * CTOR
@@ -40,7 +41,15 @@ public class TaskProcessorHandle implements Serializable {
 	_hostname = p.getHostName();
 	_port = p.getPort();
 	_capabilities = p.getCapabilities();
+	if (p.hasMainReplicator()) {
+	    System.out.println("adding main replicator to handle: " + p.getMainReplicator().getName());
+	    addMainReplicator(p.getMainReplicator().getHandle());
+	}
     }
+
+    public boolean hasMainReplicator() { return _rh != null; }
+    public ReplicatorHandle getReplicatorHandle() { return _rh; }
+    public void addMainReplicator(ReplicatorHandle rh) { _rh = rh; }
 
     public boolean valid(Processor p) {
 	VTransportContainer t = new VTransportContainer

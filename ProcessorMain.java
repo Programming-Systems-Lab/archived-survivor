@@ -12,6 +12,7 @@ import java.net.ServerSocket;
 import java.net.UnknownHostException;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.apache.xerces.parsers.SAXParser;
 import org.xml.sax.InputSource;
@@ -72,11 +73,22 @@ public class ProcessorMain {
 	
 	pm = new ProcessorBuilder(xmlPath);
 	pm.createCloudNode(peerUrl);
+
+	// Let's add a replicator to the Processor
+	Processor theProc = pm.getFirstProcessor();
+	/*
+	  Replicator r = new Replicator(theProc.getName()+"_Rep", theProc);
+	  Thread t = new Thread(r);
+	  t.start();
+	  theProc.addMainReplicator(r);
+	*/
+
 	if ((name != null) && (hostname != null) && (port != -1)) {
 	    // TODO do the stuff for getting in touch with a remoteHost
 	    TaskProcessorHandle tph = 
 					new TaskProcessorHandle(name, hostname, port);
 	    Processor p = pm.getFirstProcessor();
+	    
 	    tph.addToCloud(p);
 	}
 
@@ -86,6 +98,7 @@ public class ProcessorMain {
     private static final String CMD_STARTWF = "start wf: ";    
     private static final String CMD_CLOUD = "cloud";
     private static final String CMD_QUIT = "quit";
+    private static final String CMD_REPLICATORS = "rep";
 
     private static void setupListener(final int port, final Processor proc) {
       if (port <= 0) return;
@@ -121,6 +134,11 @@ public class ProcessorMain {
 			System.out.println("Received a cloud status request");
 			PoolData pd = proc.getPoolData();
 			System.out.println(pd.toString());
+		    } else if (command.startsWith(CMD_REPLICATORS)) {
+			Vector v = proc.getReplicators();
+			for (int i = 0; i <v.size(); i++) {
+			    System.out.println(v.get(i));
+			}
 		    } else if (command.startsWith(CMD_QUIT)) {
 			break;
 		    } else if (command.startsWith("s")) {

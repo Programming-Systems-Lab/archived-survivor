@@ -48,9 +48,14 @@ public class ProcessorBuilder {
     MessageHandler mh = null;
     
     // System.out.println("Creating a cloudNode: " + peer);
+    Replicator r;
     CloudNode cn = new CloudNode(peer, new TPTransportContainer(p), 
                                  mh = new MessageHandler
-      (p, new Replicator(p.getName(), p)));
+      (p, r = new Replicator(p.getName(), p)));
+    System.out.println("Replicator Name: " + p.getName());
+    Thread t = new Thread(r);
+    t.start();
+    p.addMainReplicator(r);
     p.setMessageHandler(mh);
   }
 

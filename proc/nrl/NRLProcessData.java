@@ -4,7 +4,7 @@ import java.util.Hashtable;
 import java.io.Serializable;
 
 public class NRLProcessData implements Serializable {
-  String workflowName = null;
+  public String workflowName = null;
   Object instanceId = null;
   String originTask = null;
   String state = null;

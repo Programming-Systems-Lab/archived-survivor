@@ -1,11 +1,12 @@
 package psl.survivor.proc;
 
 import java.util.Vector;
+import java.io.Serializable;
 
 import psl.survivor.util.*;
 import psl.survivor.net.*;
 
-public class ReplicatorHandle {
+public class ReplicatorHandle implements Serializable {
     
     private String _name; 
     private String _hostname;
@@ -19,12 +20,15 @@ public class ReplicatorHandle {
 	_port = port;
     }
 
+    public String toString() { return _name + "@" + _hostname + ":" + _port; }
+
     public String getName() { return _name; }
     public String getHostName() { return _hostname; }
     public int getPort() { return _port; }
     
     public void alertExecutingTask(Version v, Processor p) {
-	Version v1 = v.split(null); // no need to move the actual object around
+	Version v1 = v.split(p.getHandle()); // no need to move the actual object around
+
 	VTransportContainer t = new VTransportContainer
 	    (_name, _hostname, _port);
 	t.setAlertExecutingTask(v1);

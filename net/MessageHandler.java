@@ -13,6 +13,7 @@ public class MessageHandler {
 
     private int _validIdentifier = 0;
     private int _pingIdentifier = 0;
+    private int _replicatorPingIdentifier = 0;
     
     private Processor _processor;
     private Replicator _replicator;
@@ -23,6 +24,7 @@ public class MessageHandler {
     /** CTOR */
     public MessageHandler(Processor p, Replicator r) { 
 	_processor = p;
+	_replicator = r;
 	_pingRequests = new HashSet();
 	_validRequests = new HashSet();
 	_replicatorPingRequests = new HashSet();
@@ -70,9 +72,10 @@ public class MessageHandler {
 		t.setSourceName(_processor.getName());
 		t.setSourceHostName(_processor.getHostName());
 		t.setSourcePort(_processor.getPort());
+		Integer ti = new Integer(t.getIdentifier());
 		synchronized(_replicatorPingRequests) {
-		    if (_replicatorPingRequests.contains(t)) {
-			_replicatorPingRequests.remove(t);
+		    if (_replicatorPingRequests.contains(ti)) {
+			_replicatorPingRequests.remove(ti);
 		    } else {
 			if (psl.survivor.ProcessorMain.debug) System.err.println("does not contain ping reponse?");
 		    }
@@ -211,9 +214,11 @@ public class MessageHandler {
     }
     public boolean sendReplicatorPing(VTransportContainer t) {
 	if (t.isReplicatorPing()) {
+	    Integer ti = new Integer(_replicatorPingIdentifier++);
 	    synchronized (_replicatorPingRequests) {
-		_replicatorPingRequests.add(t);
+		_replicatorPingRequests.add(ti);
 	    }
+	    t.setReplicatorPing2(_replicatorPingIdentifier-1);
 	    sendMessage(t);
 	    Date start = new Date();
 	    Date now = new Date();
