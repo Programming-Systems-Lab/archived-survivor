@@ -12,6 +12,7 @@ public class MessageHandler {
     private long _WAITFORREPLICATORPING = 5000; // 5 seconds
 
     private int _validIdentifier = 0;
+    private int _pingIdentifier = 0;
     
     private Processor _processor;
     private Replicator _replicator;
@@ -38,9 +39,10 @@ public class MessageHandler {
 		t.setSourceName(_processor.getName());
 		t.setSourceHostName(_processor.getHostName());
 		t.setSourcePort(_processor.getPort());
+		Integer ti = new Integer(t.getIdentifier());
 		synchronized(_pingRequests) {
-		    if (_pingRequests.contains(t)) {
-			_pingRequests.remove(t);
+		    if (_pingRequests.contains(ti)) {
+			_pingRequests.remove(ti);
 		    } else {
 			System.err.println("does not contain ping response?");
 		    }
@@ -139,9 +141,12 @@ public class MessageHandler {
     }    
     public boolean sendPing(VTransportContainer t) {
 	if (t.isPing()) {
+	    Integer ti = new Integer(_pingIdentifier++);
 	    synchronized(_pingRequests) {
-		_pingRequests.add(t);
+		_pingRequests.add(ti);
+		System.err.println(ti);
 	    }
+	    t.setPing2(_pingIdentifier-1);
 	    sendMessage(t);
 	    Date start = new Date();
 	    Date now = new Date();
@@ -151,14 +156,20 @@ public class MessageHandler {
 			return true;
 		    }
 		}
+		now = new Date();
+		try {
+		    Thread.sleep(100);
+		} catch (InterruptedException e) {
+		    ;
+		}
+	    }
+	    synchronized(_pingRequests) {
+		if (_pingRequests.contains(ti)) {
+		    _pingRequests.remove(ti);
+		}
 	    }
 	} else {
 	    System.err.println("not a ping request but should be");
-	}
-	synchronized(_pingRequests) {
-	    if (_pingRequests.contains(t)) {
-		_pingRequests.remove(t);
-	    }
 	}
 	return false;
     }
@@ -170,7 +181,7 @@ public class MessageHandler {
 		System.err.println(ti);
 	    }
 	    t.setValid(_validIdentifier-1);
-	    sendMessage(t);
+	    sendMessage(t);  
 	    Date start = new Date();
 	    Date now = new Date();
 	    while (now.getTime() - start.getTime() < _WAITFORVALID) {

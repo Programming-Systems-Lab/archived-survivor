@@ -49,7 +49,8 @@ public class VTransportContainer implements Serializable {
     { _state = 3; _v = v; _ve = rq; }
     public void setMediate(Version v) { _state = 4; _v = v;}
     public void setValid(int i) { _state = 5; _identifier = i;}
-    public void setPing(Version v) { _state = 6; _v = v; }
+    public void setPing(Version v, int i) { _state = 6; _v = v; }
+    public void setPing2(int i) { _state = 6; _identifier = i; }
     public void setExecuteTask(Version v) { _state = 7; _v = v; }
     public void setFindRemoteProcessor(Version v, ArrayList al) 
     { _state = 8; _v = v; _al = al; }

@@ -81,6 +81,7 @@ public class NRLProcessor extends Processor {
 							      String state,
 							      Hashtable outBindings,
 							      Object instanceId) throws Throwable {
+				      System.out.println("fireNextTask ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 				      if (!(theOut.getTask().equals("END"))) {
 					  Hashtable paramTable = outBindings;
 					  String originTask = this.name; // this task is the next 'originTask'
@@ -94,6 +95,7 @@ public class NRLProcessor extends Processor {
 					      theOut.getTask();
 
                 // instanceId.toString() will be used as key!
+					  System.out.println("FIRING NEXT TASK ***************************************************************************************************************************************");
                 _resultDataStorage.put(instanceId.toString(), resultData);
 
               } else {
@@ -139,10 +141,18 @@ public class NRLProcessor extends Processor {
       // left here for backwards compatibility
       // possibly thrown by: resetTask(thisTaskName);
     }
-
-    NRLProcessData resultData
-      = (NRLProcessData) _resultDataStorage.get(instanceId.toString());
+    NRLProcessData resultData = null;
+    while (resultData == null) {
+	resultData
+	    = (NRLProcessData) _resultDataStorage.get(instanceId.toString());
+    }
     _resultDataStorage.remove(instanceId.toString());
+
+    if (resultData == null) {
+	System.out.println("resultData is null");
+    } else {
+	System.out.println("resultData is NOT null");
+    }
 
     TaskDefinition td = new TaskDefinition(resultData.nextTaskName);
     td.addRequirement(new NameValuePair(resultData.nextTaskName, "true"));
