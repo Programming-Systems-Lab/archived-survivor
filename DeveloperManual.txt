@@ -152,3 +152,16 @@ creates task definition object for each task that might be executed.
 
 *** psl.survivor.test: This package contains data for workflows that
 were used for testing purposes.
+
+
+Changes to the original system
+------------------------------
+
+ServiceHost_Serv.java in the original system is the network-aware part of each
+task processor, and it uses Java-RMI for communication with other processors
+in the workflow. Due to the nature of the system design, we required the
+ServiceHost_Serv implementation in the psl.survivor system to have a slight
+variation, viz. if ServiceHost_Serv detects that it is running as part of a
+psl.survivor runtime, it would extract and use a data item hidden in one of
+the parameters to its method that is invoked when setting up the rmi
+registration for the task processor.

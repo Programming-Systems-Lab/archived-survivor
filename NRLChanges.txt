@@ -1,0 +1,116 @@
+Report on the first iteration of the Survivor-NG system
+-------------------------------------------------------
+
+Authors:  Gaurav S. Kc (gskc@cs.columbia.edu)
+          Jean-Denis Greze (jg253@cs.columbia.edu)
+
+Overview
+--------
+
+This report describes the first round of integration of the MLS
+Workflow system from Naval Research Lab, with the Worklets
+mobile-agent infrastructure from Programming Systems Lab, Columbia
+University. The iteration was completed towards the end of Summer
+2001, and the primary idea behind the research incorporated replacing
+the default control-flow between different tasks in a given workflow
+runtime. Each task-processor node in the MLS system communicated data,
+and passed control to the following node(s) via Java-RMI.
+
+The mobile-agent approach to increasing survivability in the MLS
+system was to employ a Worklet to dynamically determine which of
+several alternate task-processors to nominate for executing the next
+task. This implementation required the use of a host-adaptor that was
+aware of the context of the processor node in which it was embedded.
+This enabled the host-adaptor to figure out which processor node to
+dispatch the Worklet to, along with the results of the last task
+execution.
+
+
+Implementation Details
+----------------------
+
+The integration of the systems had to be accomplishsed with minimal
+changes to the MLS workflow system. We achieved this by taking the
+major players of the runtime system and subclassing them for added
+functionality, thus making our enhancements completely non-intrusive.
+
+There were a few minor changes to the workflow editor; these and the
+majority of the changes to the runtime system were related to porting
+the system to a UNIX platform, e.g. replacing the hardcoded '\' as the
+filesystem separator with java.io.File.separatorChar, increasing the
+accessibility of certain member variables and methods in the key classes of
+the runtime systeme, etc.
+
+The following are those files in the original MLS workflow editor and
+runtime systems that had relatively minor changes made to them:
+o wfruntime/Scheduler_Serv.java
+o wfruntime/ServiceHost_Serv.java
+o wfruntime/WFLoader.java
+o wfruntime/WFManager_Serv.java
+
+o newdesigner/src/NRLRTGenerator.java
+o newdesigner/src/WorkflowTranslator.java
+o newdesigner/src/NetworkEditor.java
+o newdesigner/src/DomainTranslator.java
+
+o datacentric/pattern/XmlWrapper.java
+
+
+Development
+-----------
+
+The following class descriptions attempt to describe the development
+of the survivor system, version 1.0
+
+*** wfruntime.psl:
+o HostAdapter.java - this interfaces between the local task
+processor's scheduler and the WVM used for inter-processor
+communication, and control-flow transfer via Worklet transportation.
+
+o IPSLScheduler.java - derived from wfruntime.IScheduler; this is
+needed for the added functionality in each Scheduler_Serv
+
+o ManagerHostAdapter.java - this interfaces between the workflow
+Manager and its embedded WVM. It contains the functionality needed to
+start off the workflow execution using network information collected
+by the Loader
+
+o ParameterContainer.java - it contains the relevant input/output data
+passed by a taskProcessor upon completion of a task, to the next
+taskProcessor as part of its parameter set
+
+o ParameterTransportWJ.java - derived from WorkletJunction, this is a
+WorkletJunction implementation that utilizes ParameterContainer to
+transfer the control from one processor to another, while also
+transporting the relevant parameters. It works in conjunction with the
+HostAdapter to replace the RMI-based control-transfer between
+processor nodes.
+
+o PSLHostConfig.java - address-encapsulation object for performing
+lookups/additions of information on processors in the runtime. It
+determines the 'next' processor to give the task to.
+
+o PSLScheduler_Serv.java - derived from wfruntime.Scheduler_Serv, it
+creates a HostAdapter and WVM, also retrieves WVM-addressing info
+about other nodes in the system. At the end of a task-execution, it
+overrides the default NRL flow-of-control to the next taskProcessor,
+instead, it will enable the Worklet to use the local HostAdapter to
+determine an appropriate taskProcessor to handle the next task.
+
+o PSLServiceHost_Serv.java - derived from wfruntime.ServiceHost_Serv.
+
+o PSLSpecParser.java - the default config file lists a [single]
+processor for each given task in the workflow design. By contrast, the
+survivable system needed to have multiple alternatives for each task,
+and this new information is stored in the same config file.
+PSLSpecParser is used to parse this new file format
+
+o PSLWFLoader.java - derived from wfruntime.WFLoader, it
+retrieves/distributes WVM addressing info from all processor nodes in
+the network, and saves the data to persistent storage for use by the
+Manager.
+
+o PSLWFManager_Serv.java - derived from wfruntime.WFManager_Serv, it
+loads the WVM addressing info as prepared by the Loader, and
+determines which node is capable of starting off the workflow
+execution.
