@@ -1,5 +1,4 @@
 TODO:
-- fix XML schema to be more reflective of the XML we are actually using
 - what to do when receive multiple requests to kill a certain task?
 - shutdown on Processor should do some cleanup:
         + inform peers that it is going down
@@ -40,4 +39,5 @@ DONE:
   the same in the net layer, which is dumb)
 *- stop task ... done, I think ...  shutdown cloud ... done, but need
   cleanup
+*- fix XML schema to be more reflective of the XML we are actually using
 

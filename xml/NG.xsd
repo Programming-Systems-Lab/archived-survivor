@@ -1,39 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XML Spy v4.2 U (http://www.xmlspy.com) by Jean-Denis Greze (PSL Research Lab, Columbia University) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-<xs:element name="TaskProcessor">
-<xs:annotation>
-<xs:documentation>defines a TaskProcessor and its capabilities</xs:documentation>
-</xs:annotation>
-<xs:complexType>
-<xs:sequence>
-<xs:element name="Capability" maxOccurs="unbounded">
-<xs:complexType>
-<xs:attribute name="value" type="xs:string" use="required"/>
-<xs:attribute name="name" type="xs:string" use="required"/>
-</xs:complexType>
-</xs:element>
-</xs:sequence>
-<xs:attribute name="name" type="xs:string" use="required"/>
-<xs:attribute name="RMIName" type="xs:string" use="required"/>
-<xs:attribute name="TCPPort" type="xs:int" use="required"/>
-<xs:attribute name="WorkflowDefinitionPath" type="xs:string" use="optional"/>
-</xs:complexType>
-</xs:element>
-<xs:element name="TaskDefinition">
-<xs:annotation>
-<xs:documentation>defines a particular task</xs:documentation>
-</xs:annotation>
-<xs:complexType>
-<xs:sequence>
-<xs:element name="Requirement" maxOccurs="unbounded">
-<xs:complexType>
-<xs:attribute name="name" type="xs:string" use="required"/>
-<xs:attribute name="value" type="xs:string" use="required"/>
-</xs:complexType>
-</xs:element>
-</xs:sequence>
-<xs:attribute name="name" type="xs:string" use="required"/>
-</xs:complexType>
-</xs:element>
+	<xs:element name="TaskProcessor">
+		<xs:annotation>
+			<xs:documentation>defines a TaskProcessor and its capabilities, also contains a proctype, the class name of its processor which is dynamically loaded</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Capability" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="value" type="xs:string" use="required"/>
+						<xs:attribute name="name" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="RMIName" type="xs:string" use="required"/>
+			<xs:attribute name="TCPPort" type="xs:int" use="required"/>
+			<xs:attribute name="WorkflowDefinitionPath" type="xs:string" use="optional"/>
+			<xs:attribute name="proctype" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TaskDefinition">
+		<xs:annotation>
+			<xs:documentation>defines a particular task</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Requirement" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="name" type="xs:string" use="required"/>
+						<xs:attribute name="value" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>
