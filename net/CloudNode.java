@@ -264,7 +264,7 @@ public class CloudNode implements Runnable {
   }
   
   private static void usage() {
-    WVM.out.println("usage: java wfruntime.psl.CloudNode " +
+    WVM.out.println("usage: java psl.survivor.net.CloudNode " +
                     "[-c <capabilities file>]" +
                     "[-p <peer WVM URL>]" +
                     "[-h]");
