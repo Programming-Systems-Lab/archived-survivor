@@ -73,7 +73,7 @@ public class ProcessorMain {
 	    tph.addToCloud(p);
 	}
 
-        setupListener(lPort, null);
+        setupListener(lPort, pm.getFirstProcessor());
     } 
 
     private static void setupListener(final int port, final Processor proc) {
@@ -102,7 +102,7 @@ public class ProcessorMain {
                   System.exit(0);
                 } else if (command.startsWith("start wf")) {
                   System.out.println("Received a start request");
-                  // todo: uncomment proc.startWorkflow();
+                  proc.startWorkflow();
                 }
 
                 System.out.println("received command: " + command);
