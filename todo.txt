@@ -1,3 +1,7 @@
+- JD: get Replicators working by default in the ProcessorMain, fix STOP-TASK
+  Gskc: use reflection to obtain processor-TYPE
+
+
 - WVM should be created before the ServiceHost_Serv ++ NRLProcessor coz it 
  needs the rmiregistry ... or in the very least, the ServiceHost_Serv should 
  be created *after* the WVM .... might wanna make this a singleton 
