@@ -6,6 +6,7 @@ import java.util.Vector;
 import java.util.ArrayList;
 
 import psl.survivor.util.Version;
+import psl.survivor.proc.TaskProcessorHandle;
 
 public class VTransportContainer implements Serializable {
     private String _name;
@@ -17,6 +18,7 @@ public class VTransportContainer implements Serializable {
     private ArrayList _al;
     private String _sName, _sHostname;
     private int _sPort;
+    private TaskProcessorHandle _tph;
     public VTransportContainer(String name, String hostname, int port) {
 	_state = 0;
 	_name = name;
@@ -54,6 +56,11 @@ public class VTransportContainer implements Serializable {
     public void setValidResponse() { _state = 10; }
     public void setReplicatorPing() { _state = 11; }
     public void setReplicatorPingResponse() { _state = 12; }
+    public void setAddToCloud(TaskProcessorHandle tph) 
+    { _state = 13; tph = tph;}
+    public void setSendNewHandle(TaskProcessorHandle tph) 
+    { _state = 14; tph = tph;}
+    public void setSendPool(ArrayList al) { _state = 15; _al = al; }
 
     public boolean isAlertExecutingTask() { return _state == 1; }
     public Version getAlertExecutingTaskVersion() { return _v; }
@@ -76,4 +83,10 @@ public class VTransportContainer implements Serializable {
     public boolean isValidResponse() { return _state == 10; }
     public boolean isReplicatorPing() { return _state == 11; }
     public boolean isReplicatorPingResponse() { return _state == 12; }
+    public boolean isAddToCloud() { return _state == 13; }
+    public TaskProcessorHandle getAddToCloud() { return _tph; }
+    public boolean isSendNewHandle() { return _state == 14; }
+    public TaskProcessorHandle getSendNewHandle() { return _tph; }
+    public boolean isSendPool() { return _state == 15; }
+    public ArrayList getSendPool() { return _al; }
 }

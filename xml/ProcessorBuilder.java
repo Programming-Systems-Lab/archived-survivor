@@ -37,9 +37,14 @@ public class ProcessorBuilder {
 	Processor p = ((Processor)_processors.get(0)); // 1 processor only
 	
 	CloudNode cn = new CloudNode(peer, new TPTransportContainer(p), 
-				     new MessageHandler(p, new Replicator(p.getName(), p)));
+				     new MessageHandler
+					 (p, new Replicator(p.getName(), p)));
     }
 
+    public Processor getFirstProcessor() {
+	return (Processor)_processors.get(0);
+    }
+    
     public void log(String s) {
 	System.err.println(s);
     }

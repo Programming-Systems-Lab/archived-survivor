@@ -121,6 +121,12 @@ public class MessageHandler {
 		_processor.findRemoteProcessor
 		    (t.getFindRemoteProcessor1(),
 		     t.getFindRemoteProcessor2());
+	    } else if (t.isAddToCloud()) {
+		_processor.alertNewHandle(t.getAddToCloud());
+	    } else if (t.isSendNewHandle()) {
+		_processor.addProcessor(t.getSendNewHandle());
+	    } else if (t.isSendPool()) {
+		_processor.addPool(t.getSendPool());
 	    }
 	} else if (o instanceof RTransportContainer) {
 	} else if (o instanceof TPTransportContainer) {

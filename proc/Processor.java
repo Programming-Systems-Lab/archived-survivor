@@ -57,6 +57,10 @@ public class Processor implements Runnable {
     public String getRmiName() { return _rmiName; }
     public String getHostName() { return _hostname; }
 
+    public TaskProcessorHandle getHandle() {
+	return new TaskProcessorHandle(this);
+    }
+
     public void addCapability(Object o) {
 	if (!_capabilities.contains(o)) {
 	    _capabilities.add(o);
@@ -70,6 +74,26 @@ public class Processor implements Runnable {
 
     public void addProcessor(TaskProcessorHandle tph) {
 	_poolData.addProcessor(tph);
+    }
+
+    public void addPool(ArrayList al) {
+	synchronized (al) {
+	    for (int i = 0; i < al.size(); i++) {
+		addProcessor((TaskProcessorHandle)al.get(i));
+	    }
+	}
+    }
+
+    public void alertNewHandle(TaskProcessorHandle tph) {
+	addProcessor(tph);
+	ArrayList al = _poolData.getProcessors();
+	synchronized (al) {
+	    for (int i = 0; i < al.size(); i++) {
+		TaskProcessorHandle t = (TaskProcessorHandle) al.get(i);
+		t.sendNewHandle(tph, this);
+	    }
+	    tph.sendPool(al, this);
+	}
     }
 
     public void executeTask(Version theTask) {

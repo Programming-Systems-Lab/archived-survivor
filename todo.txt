@@ -1,3 +1,5 @@
+- fix problem when a remoteTaskProcessor is really local (make it be a local
+  call instead of using worklets)
 - extract WF-Name from the XML file, and make available to Processor.java
 - global logging + standardize error messages
 - hierarchy for net/*containers -or- unify net/*containers into one

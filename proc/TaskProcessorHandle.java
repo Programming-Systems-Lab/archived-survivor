@@ -24,6 +24,22 @@ public class TaskProcessorHandle {
 	_capabilities = tptc.getCapabilities();
     }
 
+    /** CTOR */
+    public TaskProcessorHandle(String name, String hostname, int port) {
+	_name = name;
+	_hostname = hostname;
+	_port = port;
+	_capabilities = new ArrayList();
+    }
+
+    /** CTOR */
+    public TaskProcessorHandle(Processor p) {
+	_name = p.getName();
+	_hostname = p.getHostName();
+	_port = p.getPort();
+	_capabilities = p.getCapabilities();
+    }
+
     public boolean valid(Processor p) {
 	VTransportContainer t = new VTransportContainer
 	    (_name, _hostname, _port);
@@ -53,6 +69,28 @@ public class TaskProcessorHandle {
 	p.getMessageHandler().sendMessage(t);
     }
 
+    public void addToCloud(Processor p) {
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setAddToCloud(p.getHandle());
+	p.getMessageHandler().sendMessage(t);
+    }
+
+    public void sendNewHandle(TaskProcessorHandle tph, Processor p) {
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setSendNewHandle(tph);
+	p.getMessageHandler().sendMessage(t);
+    }
+    
+    public void sendPool(ArrayList al, Processor p) {
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setSendPool(al);
+	p.getMessageHandler().sendMessage(t);  
+    }
+
+    // local only
     public boolean match(TaskDefinition td) {
 	synchronized (_capabilities) {
 	    ArrayList req = td.getRequirements();
@@ -73,6 +111,7 @@ public class TaskProcessorHandle {
 	}
 	return true;
     }
+    
     public String getName() { return _name; }
     public String getHostName() { return _hostname; }
     public int getPort() { return _port; }
