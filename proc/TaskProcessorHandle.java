@@ -45,7 +45,7 @@ public class TaskProcessorHandle implements Serializable {
     public boolean valid(Processor p) {
 	VTransportContainer t = new VTransportContainer
 	    (_name, _hostname, _port);
-	t.setValid();
+	t.setValid(0); // this is bad
 	return p.getMessageHandler().sendValid(t);
     }
 

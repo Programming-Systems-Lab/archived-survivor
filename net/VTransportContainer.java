@@ -19,6 +19,7 @@ public class VTransportContainer implements Serializable {
     private String _sName, _sHostname;
     private int _sPort;
     private TaskProcessorHandle _tph;
+    private int _identifier;
     public VTransportContainer(String name, String hostname, int port) {
 	_state = 0;
 	_name = name;
@@ -47,7 +48,7 @@ public class VTransportContainer implements Serializable {
     public void setReplicate(Version v, Vector rq) 
     { _state = 3; _v = v; _ve = rq; }
     public void setMediate(Version v) { _state = 4; _v = v;}
-    public void setValid() { _state = 5; }
+    public void setValid(int i) { _state = 5; _identifier = i;}
     public void setPing(Version v) { _state = 6; _v = v; }
     public void setExecuteTask(Version v) { _state = 7; _v = v; }
     public void setFindRemoteProcessor(Version v, ArrayList al) 
@@ -72,6 +73,7 @@ public class VTransportContainer implements Serializable {
     public boolean isMediate() { return _state == 4; }
     public Version getMediateVersion() { return _v; }
     public boolean isValid() { return _state == 5; }
+    public int getIdentifier() { return _identifier; }
     public boolean isPing() { return _state == 6; }
     public Version getPing() { return _v; }
     public boolean isExecuteTask() { return _state == 7; }

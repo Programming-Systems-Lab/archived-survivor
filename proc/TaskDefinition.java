@@ -1,8 +1,9 @@
 package psl.survivor.proc;
 
 import java.util.ArrayList;
+import java.io.Serializable;
 
-public class TaskDefinition {
+public class TaskDefinition implements Serializable {
 
     private String _name;
     private ArrayList _requirements;

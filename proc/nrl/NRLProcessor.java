@@ -115,6 +115,8 @@ public class NRLProcessor extends Processor {
   }
 
   protected Version executeTaskLocal(Version theTask) {
+      System.out.println("CORRECT\n\n\n");
+
     NRLProcessData processData = (NRLProcessData) theTask.data2();
 
     // need to get the following from 'taskData'
@@ -146,6 +148,8 @@ public class NRLProcessor extends Processor {
     td.addRequirement(new NameValuePair(resultData.nextTaskName, "true"));
 
     Version result = theTask.split2(resultData, td);
+
+    if (result == null) System.out.println("|||||||||||\\\\\\ bad");
 
     return result;
   }

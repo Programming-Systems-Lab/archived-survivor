@@ -114,6 +114,10 @@ public class Processor implements Runnable {
 	String taskName = ((TaskDefinition)theTask.data()).getName();
 	Version nextTask = executeTaskLocal(theTask);
 	// versioning happens here
+	// TODO remove nonsense hereunder
+	if (nextTask == null) {
+	    System.out.println("%%%%%%%%%%%%%%BAD");
+	}
 	nextTask.append(taskName);
 
 	_versionCache.addVersion(nextTask);
@@ -144,8 +148,9 @@ public class Processor implements Runnable {
 	}	
     }
 
-    private Version executeTaskLocal(Version theTask) {
+    protected Version executeTaskLocal(Version theTask) {
 	// NEED TO INTERACT WITH NRL'S CODE HERE
+	System.out.println("this is getting called?????????????????????????[][][][][][]][]");
 	return null;
     }
 
@@ -157,7 +162,9 @@ public class Processor implements Runnable {
 	    td);
 	for (int i = 0; i < al.size(); i++) {
 	    TaskProcessorHandle tph = (TaskProcessorHandle) al.get(i);
+	    System.out.print("IS VALID?");
 	    if (tph.valid(this)) {
+		System.out.println(" YES");
 		final TaskProcessorHandle tph2 = tph;
 		final Processor p = this;
 		Thread t = new Thread() {
@@ -168,6 +175,7 @@ public class Processor implements Runnable {
 		t.start();
 		return;
 	    } else {
+		System.out.println(" NO");
 		_poolData.testValidity(tph);
 	    }
 	}

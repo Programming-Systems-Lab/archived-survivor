@@ -10,6 +10,8 @@ public class MessageHandler {
     private long _WAITFORPING = 5000; // 5 seconds
     private long _WAITFORVALID = 5000; // 5 seconds
     private long _WAITFORREPLICATORPING = 5000; // 5 seconds
+
+    private int _validIdentifier = 0;
     
     private Processor _processor;
     private Replicator _replicator;
@@ -50,11 +52,13 @@ public class MessageHandler {
 		t.setSourceName(_processor.getName());
 		t.setSourceHostName(_processor.getHostName());
 		t.setSourcePort(_processor.getPort());
+		Integer ti = new Integer(t.getIdentifier());
 		synchronized(_validRequests) {
-		    if (_validRequests.contains(t)) {
-			_validRequests.remove(t);
+		    if (_validRequests.contains(ti)) {
+			_validRequests.remove(ti);
 		    } else {
-			System.err.println("does not contain ping response?");
+			System.err.println("does not contain valid response?");
+			System.err.println(ti);
 		    }
 		}
 	    } else if (t.isReplicatorPingResponse()) {
@@ -160,27 +164,35 @@ public class MessageHandler {
     }
     public boolean sendValid(VTransportContainer t) {
 	if (t.isValid()) {
+	    Integer ti = new Integer(_validIdentifier++);
 	    synchronized(_validRequests) {
-		_validRequests.add(t);
+		_validRequests.add(ti);
+		System.err.println(ti);
 	    }
+	    t.setValid(_validIdentifier-1);
 	    sendMessage(t);
 	    Date start = new Date();
 	    Date now = new Date();
 	    while (now.getTime() - start.getTime() < _WAITFORVALID) {
 		synchronized(_validRequests) {
-		    if (!_validRequests.contains(t)) {
+		    if (!_validRequests.contains(ti)) {
 			return true;
 		    }
 		}
 		now = new Date();
+		try {
+		    Thread.sleep(100);
+		} catch (InterruptedException e) {
+		    ;
+		}
+	    }
+	    synchronized(_validRequests) {
+		if (_validRequests.contains(ti)) {
+		    _validRequests.remove(ti);
+		}
 	    }
 	} else {
 	    System.err.println("not a \"valid\" request but should be");
-	}
-	synchronized(_validRequests) {
-	    if (_validRequests.contains(t)) {
-		_validRequests.remove(t);
-	    }
 	}
 	return false;
     }
