@@ -46,6 +46,7 @@ there. Kill a replicator for that node. Another replicator will notice
 that the workflow's execution was compromised and will restart
 execution at the latest version.
 
+manually start "rmiregistry 9100" outside of any java processor.
 node A: psl.survivor.ProcessorMain with test\svrt\tp1.xml
 node B: psl.survivor.ProcessorMain with test\svrt\tp2.xml
 node C: psl.survivor.ProcessorMain with test\svrt\tp3.xml

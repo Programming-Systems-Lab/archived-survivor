@@ -37,6 +37,7 @@ public class Realization extends AbstractRealization{
       System.out.println("RUNNING END TASK");
       System.out.println("DONE RUNNING END TASK");
       taskMgr().endTask(null);
+      psl.survivor.demo.Input.display("WORKFLOW COMPLETED");
     }
     catch(Exception e){
 
