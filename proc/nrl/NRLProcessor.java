@@ -60,6 +60,8 @@ public class NRLProcessor extends Processor {
 
   // BEGIN: Inherited from psl.survivor.proc.Processor /////////////////////////
 
+    private static Object _latestParam;
+
   /** Initialise and setup processor */
   public NRLProcessor(String name, int tcpPort, String rmiName, 
                       String wfDefPath, Log l) {
@@ -83,8 +85,13 @@ public class NRLProcessor extends Processor {
 
     _log.executeTaskLocal(theTask);
 
+
     // TODO need to fix the instanceId to be unique per task, not workflow
     final NRLProcessData processData = (NRLProcessData) theTask.data2();
+
+    // TODO Modify nrl's code to not use RMI, and get rid of this
+    _latestParam = processData.param;
+
     final Object instanceId = processData.instanceId;
     try {
       // copied from WFLoader
@@ -117,6 +124,9 @@ public class NRLProcessor extends Processor {
     TaskDefinition td = _workflowData.getTaskDefinition(resultData.nextTaskName);
     Version result = theTask.split2(td, resultData);
     // System.out.println(" - - - - - - - - - - - PSL! executeTaskLocal returning version> " + result);
+
+    resultData.param = _latestParam;
+
     return result;
   }
 
@@ -376,5 +386,14 @@ public class NRLProcessor extends Processor {
       super(rmiPort, wfDefPath + "|" + _processorName);
     }
   }
+
+    public static void setObject(Object o) {
+	_latestParam = o;
+    }
+
+    public static Object getObject() { 
+	return _latestParam; 
+    }
   
 }
+
