@@ -1,0 +1,86 @@
+psl.survivor.* Developer Manual
+-------------------------------
+
+
+Authors: Gaurav S. Kc (gskc@cs.columbia.edu)
+         Jean-Denis Greze (jg253@cs.columbia.edu)
+
+
+Overview
+--------
+
+psl.survivor.* (survivor) is a non-workflow-implementation-specific
+survivable framework for executing workflows.
+
+The inital build contains a psl.survivor.nrl package, providing a
+survivable adaptation of the framework for the Navy Research Lab's
+workflow system.
+
+Survivability is achieved by using Replicator Nodes that are
+responsible for monitoring the execution of the workflow. In case that
+a workflow branch is unable to succesfully succeed, Replicator Nodes
+find the latest known execution of that branch (or potentially an
+ancestor branch) and restart execution. The versioning mechanism is
+the critical component of allowing the workflow to restart even if
+much of the latest calculations are lost. In theory, a workflow branch
+can be restarted from any point in its execution as long as we can get
+to an ancestor version of that branch.
+
+Survivor also uses mobile agents (psl.worklets) for communication
+aspects between different processors. The idea being that smart agents
+can be used to move version objects and restart the workflow.
+
+Testing
+-------
+
+Survivor was tested on a completely connected workflow system. We
+looked at both individual node and multiple node failures to test the
+system.
+
+In the future, we would like to test the survivablity of the system on
+a non-connected graph representation of the workflow processors.  See
+Survivor, SurvivorNG and Survivor007 papers for more details.
+
+
+Development
+-----------
+
+The main purpose of this document is to help in the development and
+extension of survivor. Following is a package overview.
+
+*** psl.survivor: 
+o todo.txt - list of future changes (todo) and changes recently
+implemented (done)
+o ProcessorMain.java - run an individual workflow processor and have
+it join a group of processors ready to execute a workflow
+
+*** psl.survivor.net:
+This package uses worklets (psl.worklets) to implement communications
+between different Task Processors.
+o Capability.java - encapsulates the various task-processing of a Processor
+o CloudNode.java - code actually responsible for using worklets to
+communicate
+o CompositeData.java - 
+o MessageHandler.java - used by processor to communicate to other
+Processors. This class is responsible for "packing" and "unpacking"
+message sent via worklets. It invokes the proper callbacks on
+processors when receiving messages.
+o VTransportContainer.java - generic Serializable container used to
+transport data from one Processor to another.
+
+*** psl.survivor.proc:
+This package most of the classes responsible for implementating
+survivable Processing (aka executing workflows) and replication
+(keeping track of the workflow and making sure its execution reaches
+termination)
+
+*** psl.survivor.proc.nrl:
+
+*** psl.survivor.util:
+
+*** psl.survivor.xml:
+
+
+
+
+
