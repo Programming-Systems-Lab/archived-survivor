@@ -139,6 +139,95 @@ public final class NPortal {
     
     return (_procScrollPane);
   }
+  
+  // CELL-RENDERER //////////////////////////////////////////////////
+  final static class CellRenderer extends JPanel implements ListCellRenderer {
+    final JLabel _labelTask = new JLabel();
+    final JLabel _labelProc;
+    final JLabel _labelState = new JLabel();
+    final JLabel _labelProgress = new JLabel();
+    final JPanel _panelProgress = new JPanel();
+    final Font headerFont = new Font("Verdana", Font.BOLD, 18);
+    final Font regularFont = new Font("Verdana", Font.PLAIN, 12);
+    static int count = 0;
+    CellRenderer(boolean taskInfo) {
+      if (taskInfo) {
+        _labelProc = null;
+        setLayout(new GridLayout(1, 3, 5, 5));
+        add(_labelTask); add(_labelState); add(_panelProgress);
+        _panelProgress.add(_labelProgress); 
+      } else {
+        _labelProc = new JLabel();
+        setLayout(new GridLayout(1, 4, 5, 5));
+        add(_labelTask); add(_labelProc); add(_labelState); add(_panelProgress);
+        _panelProgress.add(_labelProgress); 
+      }
+      setBackground(Color.gray);
+      setOpaque(true);
+    }
+    public Component getListCellRendererComponent(JList list, 
+        Object value, int index, boolean isSelected, boolean cellHasFocus) {
+      if (value.toString().equals("HEADER")) {          
+        _labelTask.setFont(headerFont);
+        _labelState.setFont(headerFont);
+        _labelProgress.setFont(headerFont);
+        
+        _labelTask.setText(_labelProc==null ? "Task name" : "Replicating");
+        _labelState.setText("State");
+        _labelProgress.setText("Progress");
+        _panelProgress.setBackground(Color.gray);
+
+        if (_labelProc != null) {
+          _labelProc.setFont(headerFont); 
+          _labelProc.setText("Processor");
+        }        
+
+      } else if (value instanceof DisplayItem) {
+        DisplayItem di = (DisplayItem) value;
+        _labelTask.setFont(regularFont);
+        _labelState.setFont(regularFont);
+        _labelProgress.setFont(regularFont);
+
+        _labelTask.setText(di._taskName);
+        _labelProgress.setText("");
+
+        if (_labelProc == null) {
+          // running|finished|killed|resultDisposed
+          if (di.isActive()) {
+            _panelProgress.setBackground(Color.green);
+            _labelState.setText("executing");
+          } else if (di.isExited()) {
+            _panelProgress.setBackground(Color.black);
+            _labelState.setText("completed");
+          } else if (di.isKilled()) { 
+            _panelProgress.setBackground(Color.orange);
+            _labelState.setText("results disposed");
+          } else if (di.isToKill()) {
+            _panelProgress.setBackground(Color.red);
+            _labelState.setText("dispose result");
+          }
+        } else {
+          // replicating|replicated|procDown|timedOut
+          _labelProc.setFont(regularFont);
+          _labelProc.setText(di._procName);
+          if (di.isReplActive()) { 
+            _panelProgress.setBackground(Color.green);
+            _labelState.setText("replicating");
+          } else if (di.isReplExited()) {
+            _panelProgress.setBackground(Color.black);
+            _labelState.setText("completed");
+          } else if (di.isReplProcDown()) {
+            _panelProgress.setBackground(Color.red);
+            _labelState.setText("processor down");
+          } else if (di.isReplTimedOut()) {
+            _panelProgress.setBackground(Color.orange);
+            _labelState.setText("timed-out");
+          }
+        }
+      }
+      return this;
+    }
+  }
 
   // TASK-INFO DISPLAY //////////////////////////////////////////////
   final JPanel _taskPanel;
@@ -151,43 +240,7 @@ public final class NPortal {
    * 
    */
   private JScrollPane initTaskPanel() {
-    _taskList.setCellRenderer(new ListCellRenderer() {
-      public Component getListCellRendererComponent(JList list, 
-          Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        JPanel panel = new JPanel(new GridLayout(1, 3, 5, 5));
-        if (value.toString().equals("HEADER")) {          
-          JLabel label = null;
-          Font font = new Font("Verdana", Font.BOLD, 18);
-          panel.add(label = new JLabel("Task name"));
-          label.setFont(font);
-          panel.add(label = new JLabel("State"));
-          label.setFont(font);
-          panel.add(label = new JLabel("Progress"));
-          label.setFont(font);
-        } else if (value instanceof DisplayItem) {
-          DisplayItem di = (DisplayItem) value;
-          JPanel p = new JPanel();
-          JLabel l = new JLabel();
-          panel.add(new JLabel(di._taskName));
-          panel.add(l); // running|finished|killed|resultDisposed
-          panel.add(p);
-          if (di.isActive()) {
-            p.setBackground(Color.green);
-            l.setText("executing");
-          } else if (di.isExited()) {
-            p.setBackground(Color.black);
-            l.setText("completed");
-          } else if (di.isKilled()) { 
-            p.setBackground(Color.orange);
-            l.setText("results disposed");
-          } else if (di.isToKill()) {
-            p.setBackground(Color.red);
-            l.setText("dispose result");
-          }
-        }
-        return panel;
-      }
-    });
+    _taskList.setCellRenderer(new CellRenderer(true));
     _taskListModel.addElement("HEADER");
     
     _taskPanel.setLayout(new BorderLayout());
@@ -207,46 +260,7 @@ public final class NPortal {
    * initialise the replicating-info display panel
    */
   private JScrollPane initReplPanel() {
-    _replList.setCellRenderer(new ListCellRenderer() {
-      public Component getListCellRendererComponent(JList list, 
-          Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        JPanel panel = new JPanel(new GridLayout(1, 4, 5, 5));
-        if (value.toString().equals("HEADER")) {
-          JLabel label = null;
-          Font font = new Font("Verdana", Font.BOLD, 18);
-          panel.add(label = new JLabel("Replicating"));
-          label.setFont(font);
-          panel.add(label = new JLabel("Processor"));
-          label.setFont(font);
-          panel.add(label = new JLabel("State"));
-          label.setFont(font);
-          panel.add(label = new JLabel("Progress"));
-          label.setFont(font);
-        } else if (value instanceof DisplayItem) {
-          DisplayItem di = (DisplayItem) value;
-          JPanel p = new JPanel();
-          JLabel l = new JLabel("started");
-          panel.add(new JLabel(di._taskName));
-          panel.add(new JLabel(di._procName));
-          panel.add(l); // replicating|replicated|procDown|timedOut
-          panel.add(p);
-          if (di.isReplActive()) { 
-            p.setBackground(Color.green);
-            l.setText("replicating");
-          } else if (di.isReplExited()) {
-            p.setBackground(Color.black);
-            l.setText("completed");
-          } else if (di.isReplProcDown()) {
-            p.setBackground(Color.red);
-            l.setText("processor down");
-          } else if (di.isReplTimedOut()) {
-            p.setBackground(Color.orange);
-            l.setText("timed-out");
-          }
-        }
-        return panel;
-      }
-    });
+    _replList.setCellRenderer(new CellRenderer(false));
     _replListModel.addElement("HEADER");
     
     _replPanel.setLayout(new BorderLayout());

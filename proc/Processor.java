@@ -3,7 +3,7 @@ package psl.survivor.proc;
 import java.util.Set;
 import java.util.Date;
 import java.util.Vector;
-import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.ArrayList;
 
 import java.net.InetAddress;
@@ -82,7 +82,7 @@ public abstract class Processor implements Runnable {
     public Processor(String name, int tcpPort, String rmiName, 
 		     String wfDefPath, Log l) {
 	_log = l;
-	_stoppedTasks = new HashSet();
+	_stoppedTasks = new TreeSet();
 	_versionCache = new VersionCache();
 	_taskQueue = new Vector();
 	_replicatorQueue = new Vector();

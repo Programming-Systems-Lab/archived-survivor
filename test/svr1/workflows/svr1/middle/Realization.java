@@ -39,7 +39,7 @@ public class Realization extends AbstractRealization{
 	  Thread.sleep(2000);
       } catch (Exception e) {;}
 
-      System.out.println(psl.survivor.proc.nrl.NRLProcessor.getObject("key"));
+      psl.survivor.demo.Input.display("" + psl.survivor.proc.nrl.NRLProcessor.getObject("key"));
 
       taskMgr().endTask(null);
     }
