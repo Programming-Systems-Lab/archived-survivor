@@ -76,6 +76,7 @@ class CloudNode implements Runnable {
   private CloudNode(String capabilityFile, String peerURL) {
     this(null, null, 0, capabilityFile, peerURL, null, null);
   }
+
   private CloudNode(String host, String name, int port, String peerURL,
                     String capabilityFile,
                     TPTransportContainer tptc,
