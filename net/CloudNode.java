@@ -111,6 +111,10 @@ class CloudNode implements Runnable {
           System.out.println("Current nodes: " + printCapabilities());
           
         } else if (messageType.equals(REPLICATE_REQ)) {
+
+          new Exception().printStackTrace(WVM.out);
+          WVM.out.println("THIS SHOULD NOT HAPPEN!!! " + REPLICATE_REQ);
+
           // someone asked me to replicate their data
           CompositeData cd = (CompositeData) _wvm.messageQueueMsgs.get(uniqueKey);
           // 2-do: replace this by proper object type for "ReplicatedData"
@@ -126,6 +130,10 @@ class CloudNode implements Runnable {
           // might want to return an ACK to the sender!
         
         } else if (messageType.equals(RETRIEVE_REQ)) {
+
+          new Exception().printStackTrace(WVM.out);
+          WVM.out.println("THIS SHOULD NOT HAPPEN!!! " + RETRIEVE_REQ);
+
           // someone asked for data that I've replicated for someone
           CompositeData cd = (CompositeData) _wvm.messageQueueMsgs.get(uniqueKey);
           Object key = cd.getKey(), replicatedData = _data.get(key);
@@ -135,9 +143,7 @@ class CloudNode implements Runnable {
 
         } else if (messageType.equals(GENERAL_MESSAGE)) {
           Object o = _wvm.messageQueueMsgs.get(uniqueKey);
-          if (_msgHandler != null) {
-            _msgHandler.handleMessage(o);
-          }
+          if (_msgHandler != null) _msgHandler.handleMessage(o);
 
         } else {
           // 2-do: silly-ass comment
@@ -254,4 +260,3 @@ class CloudNode implements Runnable {
                     "[-h]");
   }
 }
-
