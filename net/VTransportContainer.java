@@ -2,6 +2,9 @@ package psl.survivor.net;
 
 import java.io.Serializable;
 import java.util.Vector;
+
+import psl.survivor.util.Version;
+
 public class VTransportContainer implements Serializable {
     private Version _v;
     private int _state;

@@ -21,7 +21,7 @@ import java.io.Serializable;
  * 
 */
 
-class CloudNode implements Runnable {
+public class CloudNode implements Runnable {
   private final WVM _wvm;
   private Capability _capability;
 
@@ -65,6 +65,12 @@ class CloudNode implements Runnable {
 
   private static final String GENERAL_MESSAGE = "GENERAL MESSAGE";
 
+    public CloudNode(String peer, TPTransportContainer tptc,
+		     MessageHandler mh) {
+	//GAURAV
+	// can you add this constructor above, thanks
+	this (null, null, 0, null, null, null, null);
+    }
   
   public CloudNode(String host, String name, int port,
                     String peerURL,

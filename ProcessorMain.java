@@ -17,13 +17,13 @@ public class ProcessorMain {
 	
 	String name = null;
 	String xmlPath = null;
-	String peerURL = null;
+	String peerUrl = null;
 	for (int i = 0; i+1 < args.length; i+=2) {
 	    if (args[i].equals("-f")) {
 		xmlPath = args[i+1];
 	    }
 	    if (args[i].equals("-p")) {
-		peerURL = args[i+1];
+		peerUrl = args[i+1];
 	    }
 	}
 	
@@ -32,7 +32,7 @@ public class ProcessorMain {
 	}
 	
 	pm = new ProcessorBuilder(xmlPath);
-	pm.createCloudNode(pm);
+	pm.createCloudNode(peerUrl);
     } 
 }
 
