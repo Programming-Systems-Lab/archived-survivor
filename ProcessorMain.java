@@ -75,7 +75,11 @@ public class ProcessorMain {
 
         setupListener(lPort, pm.getFirstProcessor());
     } 
-    private static final String CMD_SHUTDOWN = "shutdown";    private static final String CMD_STARTWF = "start wf: ";    
+    private static final String CMD_SHUTDOWN = "shutdown";    
+    private static final String CMD_STARTWF = "start wf: ";    
+    private static final String CMD_CLOUD = "cloud";
+    private static final String CMD_QUIT = "quit";
+
     private static void setupListener(final int port, final Processor proc) {
       if (port <= 0) return;
 
@@ -89,23 +93,32 @@ public class ProcessorMain {
               while (true) {
                 Socket s = listener.accept();
 
-                s.getOutputStream().write("Yo: ".getBytes());
-                s.getOutputStream().flush();
+		while (true) {
+		    s.getOutputStream().write("\nYo: ".getBytes());
+		    s.getOutputStream().flush();
+		    
+		    InputStream is = s.getInputStream();
+		    InputStreamReader isr = new InputStreamReader(is);
+		    BufferedReader br = new BufferedReader(isr);
+		    String command = br.readLine().toLowerCase();
+		    
+		    if (command.startsWith(CMD_SHUTDOWN)) {
+			System.out.println("Received a shutdown request");
+			System.exit(0);
+		    } else if (command.startsWith(CMD_STARTWF)) {
+			System.out.println("Received a start request");
+			proc.startWorkflow(command.substring(CMD_STARTWF.length()));
+		    } else if (command.startsWith(CMD_CLOUD)) {
+			System.out.println("Received a cloud status request");
+			PoolData pd = proc.getPoolData();
+			System.out.println(pd.toString());
+		    } else if (command.startsWith(CMD_QUIT)) {
+			break;
+		    }
+		    System.out.println("received command: " + command);
+		
+		}
 
-                InputStream is = s.getInputStream();
-                InputStreamReader isr = new InputStreamReader(is);
-                BufferedReader br = new BufferedReader(isr);
-                String command = br.readLine().toLowerCase();
-
-                if (command.startsWith(CMD_SHUTDOWN)) {
-                  System.out.println("Received a shutdown request");
-                  System.exit(0);
-                } else if (command.startsWith(CMD_STARTWF)) {
-                  System.out.println("Received a start request");
-                  proc.startWorkflow(command.substring(CMD_STARTWF.length()));
-                }
-
-                System.out.println("received command: " + command);
                 s.close();
               }
             } catch (IOException ioe) {

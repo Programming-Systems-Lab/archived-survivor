@@ -15,8 +15,11 @@ public class PoolData {
     }
 
     public void addProcessor(TaskProcessorHandle tph) {
-	System.out.println("ADDING a TPH*******************************");
 	if (!_processorHandles.contains(tph)) {
+	    for (int i = 0; i < _processorHandles.size(); i++) {
+		if (((TaskProcessorHandle)_processorHandles.get(i)).getName().equals(tph.getName())) return;
+	    }
+	    System.out.println("ADDING a TPH*******************************"); 
 	    _processorHandles.add(tph);
 	}
     }
@@ -51,5 +54,15 @@ public class PoolData {
 	synchronized(_processorHandles) {
 	    _processorHandles.remove(tph);
 	}
+    }
+    
+    public String toString() {
+	String s = "";
+	synchronized(_processorHandles) {
+	    for (int i = 0; i < _processorHandles.size(); i++) {
+		s+=_processorHandles.get(i).toString() + "\n";
+	    }
+	}
+	return s;
     }
 }

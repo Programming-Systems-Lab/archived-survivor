@@ -18,7 +18,7 @@ public class Processor implements Runnable {
     private Vector _replicatorQueue;
     private PoolData _poolData;
     protected ArrayList _capabilities;
-    private WorkflowData _workflowData;
+    protected WorkflowData _workflowData;
     private MessageHandler _messageHandler;
 
     private int _SLEEP_TIME = 500;
@@ -45,6 +45,9 @@ public class Processor implements Runnable {
 	}
 
 	_workflowData = new WorkflowData(_wfDefPath);
+
+	TaskProcessorHandle tph = new TaskProcessorHandle(this);
+       	addProcessor(tph);
     }
 
     public void setMessageHandler(MessageHandler mh) { _messageHandler = mh; }
@@ -154,7 +157,7 @@ public class Processor implements Runnable {
 	return null;
     }
 
-    protected void executeRemoteTask(final Version theTask) {      System.out.println("PSL! entered executeRemoteTask: theTask.data(): " + theTask.data().getClass().getName());
+    protected void executeRemoteTask(final Version theTask) {      System.out.println("PSL! entered executeRemoteTask: theTask.data(): " + theTask.data().getClass().getName());
       System.out.println("PSL! entered executeRemoteTask: theTask.data2(): " + theTask.data2().getClass().getName());
 	TaskDefinition td = (TaskDefinition) theTask.data();
 	ArrayList al = _poolData.getValidProcessors(td);

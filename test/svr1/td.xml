@@ -1,1 +1,11 @@
-<TaskDefinition name="taskdef1"/>
+<WorkflowDefinition>
+<Task name="start">
+<Requirement name="start" value="true"/>
+</Task>
+<Task name="middle">
+<Requirement name="middle" value="true"/>
+</Task>
+<Task name="end">
+<Requirement name="end" value="true"/>
+</Task>
+</WorkflowDefinition>

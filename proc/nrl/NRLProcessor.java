@@ -44,7 +44,7 @@ public class NRLProcessor extends Processor {
   // BEGIN: Inherited from psl.survivor.proc.Processor /////////////////////////
   public NRLProcessor(String name, int tcpPort, String rmiName, 
                       String wfDefPath) {
-      super(name, tcpPort, rmiName, wfDefPath);      System.out.println("NRLProcessor: " + name + ":" + tcpPort + "/" + rmiName);
+      super(name, tcpPort, rmiName, wfDefPath);      System.out.println("NRLProcessor: " + name + ":" + tcpPort + "/" + rmiName);
 
       wfRootDir = wfDefPath;
       rmiPort = WVM_Host.PORT;
@@ -121,7 +121,7 @@ public class NRLProcessor extends Processor {
 
     // need to get the following from 'taskData'
     wfName = processData.workflowName;
-    namePrefix = wfName;    Object instanceId = processData.instanceId;
+    namePrefix = wfName;    Object instanceId = processData.instanceId;
     String originTask = processData.originTask;
     String state = processData.state;
     Hashtable paramTable = processData.paramTable;
@@ -154,8 +154,9 @@ public class NRLProcessor extends Processor {
 	System.out.println("resultData is NOT null");
     }
 
-    TaskDefinition td = new TaskDefinition(resultData.nextTaskName);
-    td.addRequirement(new NameValuePair(resultData.nextTaskName, "true"));
+    /*    TaskDefinition td = new TaskDefinition(resultData.nextTaskName);
+	  td.addRequirement(new NameValuePair(resultData.nextTaskName, "true"));*/
+    TaskDefinition td = _workflowData.getTaskDefinition(resultData.nextTaskName);
 
     Version result = theTask.split2(td, resultData); // ya had these reversed :)
 
@@ -164,7 +165,7 @@ public class NRLProcessor extends Processor {
     return result;
   }
 
-	public void	startWorkflow(String wfName_iKey) {
+    public void	startWorkflow(String wfName_iKey) {
     log(_processorName);
     log(_tcpPort);
     log(_wfDefPath);
@@ -197,11 +198,14 @@ public class NRLProcessor extends Processor {
     // ENDED: Inherited from wfruntime.WFManager_Serv ///
 
     // TODO	actually start the first task	on an	appropriate	host
-    TaskDefinition td	=	new	TaskDefinition("START");
+    TaskDefinition td	= _workflowData.getTaskDefinition(_startTask);
+
     NRLProcessData npd = new NRLProcessData();
     
     npd.workflowName = wfName;
     npd.instanceId = new Integer(_iKey);
+
+    // TODO should that be "start"
     npd.originTask = "START";
     npd.state	=	"Success";
     npd.nextTaskName = _startTask;
@@ -225,17 +229,19 @@ public class NRLProcessor extends Processor {
 System.out.println("4: GOT AS FAR AS HERE!!!, wfName: " + wfName + ", taskName: " + taskName);
     final char sc = File.separatorChar;
     File              subDir      = new File(wfRootDir,"workflows"+sc+wfName+sc+taskName);
-    RoutingInfo       theRouting  = SpecParser.parseRouting(new File(subDir,"routing"));
-    HashSet           thePerms    = SpecParser.parseDataPerms(new File(subDir,"dataperm"));
-    Hashtable         creates     = SpecParser.parseCreates(new File(subDir,"creates"));
-    Hashtable         dTypes      = SpecParser.parseDataTypes(new File(subDir,"datatypes"));
-    Hashtable         exceptions  = SpecParser.parseExceptions(new File(subDir,"exceptions"));
-    Hashtable         fTypes      = SpecParser.parseFieldTypes(new File(subDir,"fieldtypes"));
-    IRealizationInfo  rinfo       = SpecParser.parseRealization(new File(subDir,"realization"));
-
-    IServiceHost theHost = (IServiceHost) Naming.lookup("rmi://localhost:" + rmiPort + "/serviceHost");
-    ConfigInfo theConfig = SpecParser.parseConfig(new File(wfRootDir, "workflows" + sc + wfName + sc + "config"));
-
+    System.err.println("1");
+    System.err.println("2");    RoutingInfo       theRouting  = SpecParser.parseRouting(new File(subDir,"routing"));
+    System.err.println("3");    HashSet           thePerms    = SpecParser.parseDataPerms(new File(subDir,"dataperm"));
+    System.err.println("4");    Hashtable         creates     = SpecParser.parseCreates(new File(subDir,"creates"));
+    System.err.println("5");Hashtable         dTypes      = SpecParser.parseDataTypes(new File(subDir,"datatypes"));
+    System.err.println("6");    Hashtable         exceptions  = SpecParser.parseExceptions(new File(subDir,"exceptions"));
+    System.err.println("7");Hashtable         fTypes      = SpecParser.parseFieldTypes(new File(subDir,"fieldtypes"));
+    System.err.println("8");    IRealizationInfo  rinfo       = SpecParser.parseRealization(new File(subDir,"realization"));
+    System.err.println("9");
+    System.err.println("10");    IServiceHost theHost = (IServiceHost) Naming.lookup("rmi://localhost:" + rmiPort + "/serviceHost");
+    System.err.println("11");
+    System.err.println("12");    ConfigInfo theConfig = SpecParser.parseConfig(new File(wfRootDir, "workflows" + sc + wfName + sc + "config"));
+    System.err.println("13");
     if (theRouting.getTaskType().equals("NonTransactionalTaskRealization") ||
       theRouting.getTaskType().equals("SynchronizationTaskIn") ||
       theRouting.getTaskType().equals("SynchronizationTaskOut")) {

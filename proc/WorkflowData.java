@@ -20,4 +20,16 @@ public class WorkflowData {
 	    System.out.println(_taskDefinitions.get(i));
 	}
     }
+
+    //NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+
+    public TaskDefinition getTaskDefinition(String taskname) {
+	for (int i = 0; i < _taskDefinitions.size(); i++) {
+	    if (((TaskDefinition)_taskDefinitions.get(i))
+		.getName().equals(taskname)) {
+		return (TaskDefinition)_taskDefinitions.get(i);
+	    }
+	}
+	return new TaskDefinition(taskname);
+    }
 }

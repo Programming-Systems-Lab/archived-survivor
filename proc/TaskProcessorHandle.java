@@ -126,6 +126,16 @@ public class TaskProcessorHandle implements Serializable {
     public ArrayList getCapabilities() { return _capabilities; }
     public int getSize() { return _capabilities.size(); }
     public Object getCapability(int i) { return _capabilities.get(i); }
+
+    public String toString() {
+	String s = "{{" + _name + "@" + _hostname + ":" + _port + "}\n";
+	synchronized (_capabilities) {
+	    for (int i = 0; i < _capabilities.size(); i++) {
+		s+=_capabilities.get(i)+"   ";
+	    }
+	}
+	return s + "}";
+    }
 }
 
 
