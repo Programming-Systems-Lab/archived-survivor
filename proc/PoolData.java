@@ -4,13 +4,14 @@ import java.util.ArrayList;
 public class PoolData {
     
     private ArrayList _processorHandles;
-    private Processor _processor; // TODO initialize this
+    private Processor _processor;
 
     /**
      * CTOR
      */
-    public PoolData() {
+    public PoolData(Processor p) {
 	_processorHandles = new ArrayList();
+	_processor = p;
     }
 
     public void addProcessor(TaskProcessorHandle tph) {

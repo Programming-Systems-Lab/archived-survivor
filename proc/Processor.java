@@ -31,7 +31,7 @@ public class Processor implements Runnable {
 	_versionCache = new VersionCache();
 	_taskQueue = new Vector();
 	_replicatorQueue = new Vector();
-	_poolData = new PoolData();
+	_poolData = new PoolData(this);
 	_capabilities = new ArrayList();
 	_processorName = name;
 	_tcpPort = tcpPort;
@@ -50,6 +50,7 @@ public class Processor implements Runnable {
     public void setMessageHandler(MessageHandler mh) { _messageHandler = mh; }
     public MessageHandler getMessageHandler() { return _messageHandler; }
 
+    public PoolData getPoolData() { return _poolData; }
     public String getName() { return _processorName; }
     public int getPort() { return _tcpPort; }
     public String getWfDefPath() { return _wfDefPath; }

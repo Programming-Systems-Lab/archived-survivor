@@ -14,11 +14,13 @@ public class Replicator implements Runnable {
     private HashMap _tasksInProgress;
     private String _name;
     private PoolData _poolData;
-    private Processor _processor; // TODO actually initialize this
+    private Processor _processor; 
     
     /** CTOR */
-    public Replicator(String name) {
+    public Replicator(String name, Processor p) {
 	_name = name;
+	_processor = p;
+	_poolData = p.getPoolData();
     }
     public void alertExecutingTask(Version v) {
 	_tasksInProgress.put(v, new Date());

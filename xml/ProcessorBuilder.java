@@ -37,7 +37,7 @@ public class ProcessorBuilder {
 	Processor p = ((Processor)_processors.get(0)); // 1 processor only
 	
 	CloudNode cn = new CloudNode(peer, new TPTransportContainer(p), 
-				     null); // gskc: quick hack, must remove! new MessageHandler()); // TODO
+				     new MessageHandler(p, new Replicator(p.getName(), p)));
     }
 
     public void log(String s) {
