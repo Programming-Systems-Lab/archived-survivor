@@ -59,7 +59,8 @@ public class ProcessorBuilder {
     class ProcessorHandler extends DefaultHandler {
 	private ProcessorBuilder _pm;
 	private int _depth;
-
+	
+	private String _processorType = "psl.survivor.proc.Processor";
 	private String _processorName = "default";
 	private int _tcpPort = 8883;
 	private String _rmiName = "";
@@ -79,6 +80,8 @@ public class ProcessorBuilder {
 	    if (localName.equals("TaskProcessor")) {
 		if (_depth == 0) {
 		    String s;
+		    s = attributes.getValue("", "proctype");
+		    if (s != null) _processorType = s;
 		    s = attributes.getValue("", "name");
 		    if (s != null) _processorName = s;
 		    s = attributes.getValue("", "TCPPort");
@@ -113,6 +116,9 @@ public class ProcessorBuilder {
 	    _depth--;
 	    if (localName.equals("TaskProcessor")) {
 		if (_depth == 0) {
+
+		    // GSKC TODO
+		    // _processorType
 		    Processor p = new psl.survivor.proc.nrl.NRLProcessor
 			(_processorName, _tcpPort, _rmiName,
 			 _wfDefPath);

@@ -22,6 +22,7 @@ public class Processor implements Runnable {
     private MessageHandler _messageHandler;
 
     private int _SLEEP_TIME = 500;
+    private int _SLEEP_TIME2 = 1000;
 
     /**
      * CTOR
@@ -132,6 +133,15 @@ public class Processor implements Runnable {
 	alertReplicatorsDoneExecutingTask(theTask);
     }
 
+    public void stopTask(Version v) {
+	
+
+	System.err.println(" ##############################################################################################################################################################\nSTOP TASK WOULD BE HAPPENING NOW\n"+v+"\n##############################################################################################################################################################");
+
+	// WE NEED TO FIGURE OUT HOW TO DO THIS PROPERLY
+	// RIGHT NOW, CAN WE STOP A RUNNING TASK
+    }
+
     private void alertReplicatorsExecutingTask(Version theTask) {
 	synchronized(_replicatorQueue) {
 	    for (int i = 0; i < _replicatorQueue.size(); i++) {
@@ -189,6 +199,17 @@ public class Processor implements Runnable {
 	// TODO
 	// something like findRemoteProcessor in Replicator
 	log("no processor to execute task: " + theTask);
+	Thread t = new Thread () {
+		public void run() {
+		    try {
+			Thread.sleep(_SLEEP_TIME2);
+		    } catch (InterruptedException e) {
+			;
+		    }
+		    queueTask(theTask);
+		}
+	    };
+	t.start();
 	// TODO
 	// uncomment the following line in the long term
 	//	queueTask(theTask);

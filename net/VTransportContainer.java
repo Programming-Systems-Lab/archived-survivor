@@ -63,6 +63,7 @@ public class VTransportContainer implements Serializable {
     public void setSendNewHandle(TaskProcessorHandle tph) 
     { _state = 14; _tph = tph;}
     public void setSendPool(ArrayList al) { _state = 15; _al = al; }
+    public void setStopTask(Version v) { _state = 16; _v = v; }
 
     public boolean isAlertExecutingTask() { return _state == 1; }
     public Version getAlertExecutingTaskVersion() { return _v; }
@@ -92,6 +93,8 @@ public class VTransportContainer implements Serializable {
     public TaskProcessorHandle getSendNewHandle() { return _tph; }
     public boolean isSendPool() { return _state == 15; }
     public ArrayList getSendPool() { return _al; }
+    public boolean isStopTask() { return _state == 16; }
+    public Version getStopTask() { return _v; }
 
     public String toString() {
       return "VTransportContainer: [" + _state + ", " + _identifier + ", " + _v + "]";

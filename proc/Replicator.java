@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.Date;
 import psl.survivor.util.*;
 public class Replicator implements Runnable {
+    
+    private final int _TIME_TO_PROCESS = 10 * 1000;
+
     private int _SLEEP_TIME = 1000;
     private int _executionThreshold = 1000*60;
     private VersionCache _versionCache;
@@ -46,6 +49,14 @@ public class Replicator implements Runnable {
 	synchronized (_tasksInProgress) {
 	    TaskProcessorHandle tph = (TaskProcessorHandle)v.data();
 	    if (tph.ping(v.split(null), _processor)) return;
+	    _tasksInProgress.remove(v);
+	    mediateSurvivor(v);
+	}
+    }
+    private void forceSurvive(Version v) {
+	synchronized (_tasksInProgress) {
+	    TaskProcessorHandle tph = (TaskProcessorHandle)v.data();
+	    tph.stopTask(v, _processor);
 	    _tasksInProgress.remove(v);
 	    mediateSurvivor(v);
 	}
@@ -129,6 +140,17 @@ public class Replicator implements Runnable {
 			Thread t = new Thread() {
 				public void run() {
 				    survive(v1);
+				}
+			    };
+			t.start();
+		    }
+		    Date d = (Date) _tasksInProgress.get(v);
+		    Date now = new Date();
+		    if ((now.getTime() - _TIME_TO_PROCESS) > d.getTime()) {
+			final Version v1 = v;
+			Thread t = new Thread() {
+				public void run() {
+				    forceSurvive(v1);
 				}
 			    };
 			t.start();

@@ -65,6 +65,13 @@ public class TaskProcessorHandle implements Serializable {
 	p.getMessageHandler().sendMessage(t);
     }
 
+    public void stopTask(Version theTask, Processor p) {
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setStopTask(theTask);
+	p.getMessageHandler().sendMessage(t);
+    }
+
     public void findRemoteProcessor(Version v, ArrayList al, Processor p) {
 	VTransportContainer t = new VTransportContainer
 	    (_name, _hostname, _port);

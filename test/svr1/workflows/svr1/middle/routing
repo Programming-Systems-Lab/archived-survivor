@@ -1,7 +1,7 @@
 NonTransactionalTaskRealization
 InputGroups 1
 Inputs 1
-start Success
+START Success
 InputParams 0
 SOutputs 1
 true

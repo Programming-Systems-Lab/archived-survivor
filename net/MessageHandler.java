@@ -134,6 +134,8 @@ public class MessageHandler {
 		_processor.addProcessor(t.getSendNewHandle());
 	    } else if (t.isSendPool()) {
 		_processor.addPool(t.getSendPool());
+	    } else if (t.isStopTask()) {
+		_processor.stopTask(t.getStopTask());
 	    }
 	} else if (o instanceof RTransportContainer) {
 	} else if (o instanceof TPTransportContainer) {
