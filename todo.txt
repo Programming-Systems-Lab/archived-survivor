@@ -1,9 +1,17 @@
-- add to processorMain: 
-  - listen on a service port so that the node can be used to start workflow
+- WVM should be created before the ServiceHost_Serv ++ NRLProcessor coz it 
+ needs the rmiregistry ... or in the very least, the ServiceHost_Serv should 
+ be created *after* the WVM .... might wanna make this a singleton 
+ ServiceHost_Serv, btw
+
+- need to either change the RMI name for the ServiceHost_Serv to 
+  <taskName>-serviceHost, or not use RMI at all here .. 
+
+- create a different ServiceHost_Serv/Scheduler_Serv for every invocation 
+   of executeTaskLocal in NRLProcessor
+
 
 - fix problem when a remoteTaskProcessor is really local (make it be a local
   call instead of using worklets)
-- extract WF-Name from the XML file, and make available to Processor.java
 - global logging + standardize error messages
 - hierarchy for net/*containers -or- unify net/*containers into one
   container
