@@ -1,52 +1,43 @@
+TODO:
 - fix XML schema to be more reflective of the XML we are actually using
-
 - what to do when receive multiple requests to kill a certain task?
 - shutdown on Processor should do some cleanup:
         + inform peers that it is going down
         + maybe if some task is still running, refuse to shutdown, etc
-
-
 - what to do if receive request to run a task that is already executing, but
   hasn't completed ... ie. is an 'endangered task'
-
-- GSKC: stop task ... done, I think ... 
-        shutdown cloud ... done, but need cleanup
-
-- JD: need to fix the versioning to have 3 version
-      much other stuff
-
-- JD: get Replicators working by default in the ProcessorMain, fix STOP-TASK
-  Gskc: use reflection to obtain processor-TYPE
-
-
-- WVM should be created before the ServiceHost_Serv ++ NRLProcessor coz it 
- needs the rmiregistry ... or in the very least, the ServiceHost_Serv should 
- be created *after* the WVM .... might wanna make this a singleton 
- ServiceHost_Serv, btw
-
+- need to fix the versioning to have a pre-execution, mid-execution and
+  post-execution version
+- WVM should be created before the ServiceHost_Serv ++ NRLProcessor
+  coz it needs the rmiregistry ... or in the very least, the
+  ServiceHost_Serv should be created *after* the WVM .... might wanna
+  make this a singleton ServiceHost_Serv, btw
 - need to either change the RMI name for the ServiceHost_Serv to 
-  <taskName>-serviceHost, or not use RMI at all here .. 
-
+  <taskName>-serviceHost, or not use RMI at all here
 - create a different ServiceHost_Serv/Scheduler_Serv for every invocation 
    of executeTaskLocal in NRLProcessor
-
-
 - fix problem when a remoteTaskProcessor is really local (make it be a local
   call instead of using worklets)
 - global logging + standardize error messages
 - hierarchy for net/*containers -or- unify net/*containers into one
   container
-- separate monitors (just check if a host is up) from replicators 
-  (actually replicate data from a host)
 - standardize some of the arguments and names of files
-- differentiate between valid and ping (right now, they are treated
-  the same in the net layer, which is dumb)
 - make names in VTransportContainer more logical
-- *** get rid of the ugliness in which the handles are being used. we
+- get rid of the ugliness in which the handles are being used. we
       should probably use some other class to invoke the transport
       layer cleanly.
-- fix the replication of data (such as name, port and hostname) all
-  over the place.
 - swap the semantics meaning between valid and ping! It's currently
   the opposite of what it should be.
 - get rid of 2 objects in Version object
+- fix service discovery aspect so that we don't learn about each service more than once (as happens now). It's a small bug that doesn't affect the "working" nature of the final product, but it's still a bug.
+
+DONE:
+*- JD: get Replicators working by default in the ProcessorMain, fix STOP-TASK
+  Gskc: use reflection to obtain processor-TYPE
+*- fix the replication of data (such as name, port and hostname) all
+  over the place.
+*- differentiate between valid and ping (right now, they are treated
+  the same in the net layer, which is dumb)
+*- stop task ... done, I think ...  shutdown cloud ... done, but need
+  cleanup
+

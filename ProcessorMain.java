@@ -33,7 +33,9 @@ public class ProcessorMain {
     public static boolean debug = false;
 
     /**
+     * MAIN
      *
+     * Arguments:
      * -f <filename> = xml file describing capabilities of this processor
      * -n <name> = of processor we are going to connect to. Processor
      *             executing workflows are connected.
