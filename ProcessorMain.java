@@ -1,7 +1,6 @@
 package psl.survivor;
 
 import java.io.*;
-
 import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,8 +22,28 @@ import org.xml.sax.Attributes;
 import psl.survivor.xml.ProcessorBuilder;
 import psl.survivor.proc.*;
 
+/**
+ * Used to start a node capabale of running a workflow.
+ *
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu)
+ * @author Gaurav Kc (gskc@cs.columbia.edu)
+ */
 public class ProcessorMain {
+
     public static boolean debug = false;
+
+    /**
+     *
+     * -f <filename> = xml file describing capabilities of this processor
+     * -n <name> = of processor we are going to connect to. Processor
+     *             executing workflows are connected.
+     * -h <hostname> = of processor we are going to connect to.
+     * -p <port> = of processor we are going to connect to.
+     * -l <port> = local port that this processor will listen to. this is
+     *             used to communicate to a processor that we want it to
+     *             take some action such as starting the workflow.
+     * -d d = use debug mode
+     */
     public static void main(String[] args) {
 	ProcessorBuilder pm = null;
 	
@@ -38,11 +57,7 @@ public class ProcessorMain {
 	    if (args[i].equals("-f")) {
 		xmlPath = args[i+1];
 	    }
-      /*
-	    if (args[i].equals("-p")) {
-		peerUrl = args[i+1];
-	    }
-      */
+
 	    if (args[i].equals("-n")) {
 		name = args[i+1];
 	    }
@@ -71,27 +86,23 @@ public class ProcessorMain {
 	    return;
 	}
 	
+	// Create a processor
 	pm = new ProcessorBuilder(xmlPath);
 	pm.createCloudNode(peerUrl);
 
-	// Let's add a replicator to the Processor
-	Processor theProc = pm.getFirstProcessor();
-	/*
-	  Replicator r = new Replicator(theProc.getName()+"_Rep", theProc);
-	  Thread t = new Thread(r);
-	  t.start();
-	  theProc.addMainReplicator(r);
-	*/
-
+	// If we are to connect to another processor
 	if ((name != null) && (hostname != null) && (port != -1)) {
-	    // TODO do the stuff for getting in touch with a remoteHost
-	    TaskProcessorHandle tph = new TaskProcessorHandle(name, hostname, port);
+	    TaskProcessorHandle tph = new TaskProcessorHandle
+		(name, hostname, port);
 	    Processor p = pm.getFirstProcessor();
 	    tph.addToCloud(p);
 	}
 
-        setupListener(lPort, pm.getFirstProcessor());
+	if (lPort != -1)
+	    setupListener(lPort, pm.getFirstProcessor());
     } 
+
+    // commands that can be used on the listenning port
     private static final String CMD_SHUTDOWN = "shutdown";    
     private static final String CMD_SHUTDOWN_ALL = "shutdown all";
     private static final String CMD_STARTWF = "start wf: ";    
@@ -99,11 +110,15 @@ public class ProcessorMain {
     private static final String CMD_QUIT = "quit";
     private static final String CMD_REPLICATORS = "rep";
 
+
+    /**
+     * Setup a local port where the processor awaits for commands such
+     * as that to start the workflow.
+     */
     private static void setupListener(final int port, final Processor proc) {
       if (port <= 0) return;
 
       try {
-        System.out.println("listening on socket: " + port);
 
         final ServerSocket listener = new ServerSocket(port);
         (new Thread() {
@@ -113,7 +128,8 @@ public class ProcessorMain {
                 Socket s = listener.accept();
 
 		while (true) {
-		    s.getOutputStream().write("\nYo: ".getBytes());
+		    s.getOutputStream().write
+			("\n[Processor Prompt] ".getBytes());
 		    s.getOutputStream().flush();
 		    
 		    InputStream is = s.getInputStream();
@@ -127,9 +143,9 @@ public class ProcessorMain {
 		    } else if (command.startsWith(CMD_SHUTDOWN_ALL)) {
 			System.out.println("Received a shutdown-all request");
 			System.exit(0);
-		    /* } else if (command.startsWith(CMD_STARTWF)) {
-			System.out.println("Received a start request");
-			proc.startWorkflow(command.substring(CMD_STARTWF.length())); */
+			/* } else if (command.startsWith(CMD_STARTWF)) {
+			   System.out.println("Received a start request");
+			   proc.startWorkflow(command.substring(CMD_STARTWF.length())); */
 		    } else if (command.startsWith(CMD_CLOUD)) {
 			System.out.println("Received a cloud status request");
 			PoolData pd = proc.getPoolData();
@@ -164,4 +180,8 @@ public class ProcessorMain {
       }
     }
 }
+
+
+
+
 

@@ -23,10 +23,22 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.lang.reflect.Constructor;
 
+/**
+ * Builds Processors out of xml file with processor capabilities.
+ * JDOM is being used for xml parsing purposes.
+ *
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu)
+ * @author Gaurav Kc (gskc@cs.columbia.edu)
+ */
 public class ProcessorBuilder {
+
   private SAXParser _sxp = null;
+
+  // we may make multiple processors, though only the first one
+  // is set up to run currently.
   private ArrayList _processors = null;
 
+  
   public ProcessorBuilder(String xmlPath) {
     _sxp = new SAXParser();
     _sxp.setContentHandler(new ProcessorHandler(this));
@@ -36,25 +48,30 @@ public class ProcessorBuilder {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    for (int i = 0; i < _processors.size(); i++) {
+  
+  // start all the processors
+  for (int i = 0; i < _processors.size(); i++) {
       Processor p = ((Processor)_processors.get(i));
       Thread t = new Thread(p);
       t.start();
     }
   }
 
+    /**
+     * Once we are done building all processors, we can build the cloud
+     */
   public void createCloudNode(String peer) {
     Processor p = ((Processor)_processors.get(0)); // 1 processor only
     MessageHandler mh = null;
     
-    // System.out.println("Creating a cloudNode: " + peer);
-    Replicator r;
+    // setup replicator
+      Replicator r;
     CloudNode cn = new CloudNode(peer, new TPTransportContainer(p), 
                                  mh = new MessageHandler
       (p, r = new Replicator(p.getName(), p)));
-    System.out.println("Replicator Name: " + p.getName());
     Thread t = new Thread(r);
-    t.start();
+    t.start(); // start the replicator
+
     p.addMainReplicator(r);
     p.setMessageHandler(mh);
   }
@@ -71,10 +88,17 @@ public class ProcessorBuilder {
     System.err.println(i);
   }
 
+    /**
+     * The callback class for the xml parsing
+     */
   class ProcessorHandler extends DefaultHandler {
     private ProcessorBuilder _pm;
-    private int _depth;
+      private int _depth; 
+      // keep track of how deep in the xml
+      // tree we currently are
     
+      // we actually dynamically figure out the processor type.
+      // this is only here as a default
     private String _processorType = "psl.survivor.proc.Processor";
     private String _processorName = "default";
     private int _tcpPort = 8883;
@@ -107,11 +131,11 @@ public class ProcessorBuilder {
             ("", "WorkflowDefinitionPath");
           if (s != null) _wfDefPath = s;
         } else {
-          _pm.log("bad");
+	    // _pm.log("bad");
         }
       } else if (localName.equals("Capability")) {
-        if (_depth == 1) {
-          String s1, s2;
+	  if (_depth == 1) { // setup capabilities
+          String s1, s2; 
           s1 = attributes.getValue("", "name");
           s2 = attributes.getValue("", "value");
           if ((s1 != null) && (s2 != null)) {
@@ -120,7 +144,7 @@ public class ProcessorBuilder {
             _capabilities.add(nv);
           }
         } else {
-          _pm.log("bad");
+	    // _pm.log("bad");
         }
       }
       _depth++;
@@ -129,6 +153,8 @@ public class ProcessorBuilder {
                            String localName, String qName)
       throws SAXException {
       _depth--;
+      // we we get an endelement for a processor, we can make
+      // an instance of it
       if (localName.equals("TaskProcessor")) {
         if (_depth == 0) {
 
@@ -138,7 +164,6 @@ public class ProcessorBuilder {
           Constructor constr = null;
           Processor p = null;
           
-          // Processor p = new psl.survivor.proc.nrl.NRLProcessor(_processorName, _tcpPort, _rmiName, _wfDefPath);
           try {
             procClass = Class.forName(_processorType);
             constr = procClass.getConstructor(parameterTypes);
@@ -162,12 +187,12 @@ public class ProcessorBuilder {
           _rmiName = "";
           _wfDefPath = "";		    
         } else {
-          _pm.log("bad");
+	    // _pm.log("bad");
         }
       } else if (localName.equals("Capability")) {
         if (_depth == 1) {
         } else {
-          _pm.log("bad");
+	    // _pm.log("bad");
         }
       }
     }
@@ -178,3 +203,6 @@ public class ProcessorBuilder {
     }
   }
 }
+
+
+

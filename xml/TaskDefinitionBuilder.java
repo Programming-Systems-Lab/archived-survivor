@@ -12,12 +12,21 @@ import org.xml.sax.Attributes;
 import psl.survivor.proc.*;
 import psl.survivor.util.*;
 
+/**
+ * Used to parse a TaskDefinition xml file and build 
+ * TaskDefinitions out of it.
+ * JDOM is used for xml parsing.
+ *
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu)
+ * @author Gaurav Kc (gskc@cs.columbia.edu)
+ */
+
 public class TaskDefinitionBuilder {
     private SAXParser sxp = null;
     ArrayList _taskDefinitions = null;
 
     public TaskDefinitionBuilder(String xmlPath) {
-	log("xmlPath: " + xmlPath);
+	// log("xmlPath: " + xmlPath);
 	
 	sxp = new SAXParser();
 	sxp.setContentHandler(new TaskDefinitionHandler(this));
@@ -27,28 +36,30 @@ public class TaskDefinitionBuilder {
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
-	for (int i = 0; i < _taskDefinitions.size(); i++) {
-	    TaskDefinition td = (TaskDefinition)_taskDefinitions.get(i);
-	    log(td.toString());
-	}
     }  
+
     public void log(String s) {
 	if (psl.survivor.ProcessorMain.debug) System.err.println(s);
     }
+
     public void log(int i) {
 	if (psl.survivor.ProcessorMain.debug) System.err.println(i);
     }
+
     public ArrayList getTaskDefinitions() { return _taskDefinitions; }
+
     class TaskDefinitionHandler extends DefaultHandler {
 	private TaskDefinitionBuilder _tdb;
 	private int _depth;
 	private String _name = "default";
 	private ArrayList _taskDefinitions = new ArrayList();
 	private ArrayList _requirements = new ArrayList();
+
 	public TaskDefinitionHandler(TaskDefinitionBuilder tdb) {
 	    _tdb = tdb;
 	    _depth = 0;
 	}
+
 	public void startElement(String uri, String localName,
 				 String qName,
 				 Attributes attributes) 
@@ -56,7 +67,7 @@ public class TaskDefinitionBuilder {
 	    if (localName.equals("WorkflowDefinitino")) {
 		if (_depth == 0) {
 		} else {
-		    _tdb.log("bad");
+		    // _tdb.log("bad");
 		}
 	    }
 	    if (localName.equals("Task")) {
@@ -64,7 +75,7 @@ public class TaskDefinitionBuilder {
 		    String s = attributes.getValue("", "name");
 		    if (s != null) _name = s;
 		} else {
-		    _tdb.log("bad");
+		    // _tdb.log("bad");
 		}
 	    } else if (localName.equals("Requirement")) {
 		if (_depth == 2) {
@@ -77,11 +88,12 @@ public class TaskDefinitionBuilder {
 			_requirements.add(nv);
 		    }
 		} else {
-		    _tdb.log("bad");
+		    // _tdb.log("bad");
 		}
 	    }
 	    _depth++;
 	}
+
 	public void endElement(String namespaceURI, 
 			       String localName, String qName)
 	    throws SAXException {
@@ -89,7 +101,7 @@ public class TaskDefinitionBuilder {
 	    if (localName.equals("WorkflowDefinition")) {
 		if (_depth == 0) {
 		} else {
-		    _tdb.log("bad");
+		    // _tdb.log("bad");
 		}
 	    } else if (localName.equals("Task")) {
 		if (_depth == 1) {
@@ -101,12 +113,12 @@ public class TaskDefinitionBuilder {
 		    _requirements.clear();
 		    _name = "default";
 		} else {
-		    _tdb.log("bad");
+		    // _tdb.log("bad");
 		}
 	    } else if (localName.equals("Requirement")) {
 		if (_depth == 2) {
 		} else {
-		    _tdb.log("bad");
+		    // _tdb.log("bad");
 		}
 	    }
 	}
