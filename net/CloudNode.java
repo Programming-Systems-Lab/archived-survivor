@@ -73,7 +73,9 @@ public class CloudNode implements Runnable {
 
     // jeandenis
     // is this what you mean?
-    this(tptc.getHostName(), tptc.getName(), tptc.getPort(), peerURL, null, tptc, mh);
+      
+      // oh yeah that -1 is such a freakin' hack
+    this(tptc.getHostName(), tptc.getName(), tptc.getPort()-1, peerURL, null, tptc, mh);
   }
   
   public CloudNode(String host, String name, int port,
@@ -108,6 +110,8 @@ public class CloudNode implements Runnable {
     
     // add own capability into local 'knowledge-base' of network
     _peers.addElement(_capability);
+
+    System.out.println("WVMPORT:" + _wvm.getWVMPort());
     
     _wvm.requestHandler = new Runnable() {
       public void run() {

@@ -15,6 +15,7 @@ public class PoolData {
     }
 
     public void addProcessor(TaskProcessorHandle tph) {
+	System.out.println("ADDING a TPH*******************************");
 	if (!_processorHandles.contains(tph)) {
 	    _processorHandles.add(tph);
 	}
@@ -27,9 +28,10 @@ public class PoolData {
 	ArrayList returnValue = new ArrayList();
 
 	synchronized(_processorHandles) {
-	    for (int i = 0; i < _processorHandles.size(); i++) {
+	    for (int i = 0; i < _processorHandles.size(); i++) {	
 		TaskProcessorHandle tph = (TaskProcessorHandle) 
 		    _processorHandles.get(i);
+		System.out.println("checking out taskHandle:" + tph);
 		if (tph.match(td)) {
 		    returnValue.add(tph);
 		}

@@ -26,6 +26,7 @@ public class MessageHandler {
     }
     public void setCloudNode(CloudNode cn) { _cloudNode = cn; }
     public void handleMessage(Object o) {
+	System.out.println("&&&&&&&&& Received Message:\n"+o);
 	if (o instanceof VTransportContainer) {
 	    VTransportContainer t = (VTransportContainer) o;
 	    if (t.isPingResponse()) {
@@ -67,7 +68,7 @@ public class MessageHandler {
 		    if (_replicatorPingRequests.contains(t)) {
 			_replicatorPingRequests.remove(t);
 		    } else {
-			System.err.println("does not contain rping reponse?");
+			System.err.println("does not contain ping reponse?");
 		    }
 		}
 	    } else if (t.isReplicatorPing()) {
@@ -210,6 +211,7 @@ public class MessageHandler {
 	return false;
     }
     public void sendMessage(VTransportContainer t) {
+	System.out.println("&&&&&&&&&&&&&&&& Sending Message:\n " + t);
 	t.setSource(_processor.getName(),
 		    _processor.getHostName(),
 		    _processor.getPort());

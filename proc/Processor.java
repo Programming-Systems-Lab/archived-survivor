@@ -85,17 +85,20 @@ public class Processor implements Runnable {
     }
 
     public void alertNewHandle(TaskProcessorHandle tph) {
-	addProcessor(tph);
+	log(" alert new Handle ");
 	ArrayList al = _poolData.getProcessors();
 	synchronized (al) {
 	    for (int i = 0; i < al.size(); i++) {
 		TaskProcessorHandle t = (TaskProcessorHandle) al.get(i);
-    if (t==null)  {
-      System.out.println("t == null");
-    } else {
-		  t.sendNewHandle(tph, this);
-    }
+		if (t==null)  {
+		    System.out.println("t == null");
+		} else {
+		    System.out.println("t.sendNewHandle");
+		    t.sendNewHandle(tph, this);
+		}
 	    }
+	    addProcessor(tph);
+	    System.out.println("tph.sendPool");
 	    tph.sendPool(al, this);
 	}
     }
@@ -149,6 +152,9 @@ public class Processor implements Runnable {
     protected void executeRemoteTask(final Version theTask) {
 	TaskDefinition td = (TaskDefinition) theTask.data();
 	ArrayList al = _poolData.getValidProcessors(td);
+	log("number of valid processors:" + al.size());
+	log("TaskDefinition of what we are looking for:" + 
+	    td);
 	for (int i = 0; i < al.size(); i++) {
 	    TaskProcessorHandle tph = (TaskProcessorHandle) al.get(i);
 	    if (tph.valid(this)) {
@@ -168,7 +174,9 @@ public class Processor implements Runnable {
 	// TODO
 	// something like findRemoteProcessor in Replicator
 	log("no processor to execute task: " + theTask);
-	queueTask(theTask);
+	// TODO
+	// uncomment the following line in the long term
+	//	queueTask(theTask);
     }
 
     private void replicate(Version theTask) {

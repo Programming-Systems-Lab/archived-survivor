@@ -89,13 +89,18 @@ public class TaskProcessorHandle implements Serializable {
 	VTransportContainer t = new VTransportContainer
 	    (_name, _hostname, _port);
 	t.setSendPool(al);
+	System.out.println("SEND: " + _name + "@" + _hostname + ":" + _port);
 	p.getMessageHandler().sendMessage(t);  
+	System.out.println("DONE SEND");
     }
 
     // local only
     public boolean match(TaskDefinition td) {
 	synchronized (_capabilities) {
 	    ArrayList req = td.getRequirements();
+	    if (req.size() == 0) {
+		return true;
+	    }
 	    Iterator it = req.iterator();
 	    while (it.hasNext()) {
 		Object o = it.next();
