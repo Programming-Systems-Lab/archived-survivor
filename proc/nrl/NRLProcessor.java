@@ -217,7 +217,7 @@ public class NRLProcessor extends Processor {
 
     
     // the rmiService needs to have been setup by this point!
-    IServiceHost theHost = (IServiceHost) Naming.lookup("rmi://localhost:" + rmiPort + "/serviceHost");
+    IServiceHost theHost = (IServiceHost) Naming.lookup("rmi://localhost:" + rmiPort + "/serviceHost_" + _processorName);
     
     ConfigInfo theConfig = SpecParser.parseConfig(new File(wfRootDir, "workflows" + sc + wfName + sc + "config"));
 
@@ -302,6 +302,7 @@ public class NRLProcessor extends Processor {
       String originTask = processData.originTask;
       String state = processData.state;
       Hashtable paramTable = processData.paramTable;
+      System.out.println("printing paramTable in resetTask: " + paramTable);
 
       // transition: moved in from executeTaskLocal
       _serviceHost._scheduler.transition(instanceId, originTask, state, paramTable);
@@ -325,8 +326,12 @@ public class NRLProcessor extends Processor {
   class NRLServiceHost extends ServiceHost_Serv {
     Scheduler_Serv _scheduler = null;
     NRLServiceHost(int rmiPort, String wfDefPath) throws Throwable {
-      super(rmiPort, wfDefPath);
+      super(rmiPort, wfDefPath + "|" + _processorName);
     }
   }
   
 }
+
+
+
+
