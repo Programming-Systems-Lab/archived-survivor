@@ -21,6 +21,10 @@ import java.io.Serializable;
  * 
 */
 
+/**
+ * This class constitutes a 'node' as a part of the overlaid network
+ *  orthogonal to the original workflow network topology
+ */
 public class CloudNode implements Runnable {
   private final WVM _wvm;
   private Capability _capability;
@@ -57,27 +61,41 @@ public class CloudNode implements Runnable {
   /** storage of data resultant from task completion */
   private final Hashtable _data;
   
+  /** 'message header' */
   private static final String CAPABILITY_REQ = "WHAT'S YOUR CAPABILITY";
+  /** 'message header' */
   private static final String CAPABILITY_RESP = "THAT'S MY CAPABILITY";
   
+  /** 'message header' */
   private static final String REPLICATE_REQ = "PLEASE REPLICATE MY DATA";
+  /** 'message header' */
   private static final String RETRIEVE_REQ = "PLEASE REPLICATE MY DATA";
 
+  /** 'message header' */
   private static final String GENERAL_MESSAGE = "GENERAL MESSAGE";
 
+  /**
+   * Constructor
+   * @param peerURL WVM-style URL for remote node to connect to
+   * @param tptc container object for this node's information
+   * @param mh callback-style messageHandler for handling messages
+   *  received through the WVM
+   */
   public CloudNode(String peerURL, TPTransportContainer tptc,
          MessageHandler mh) {
-    //GAURAV
-    // can you add this constructor above, thanks
-    // this (null, null, 0, null, null, null, null);
-
-    // jeandenis
-    // is this what you mean?
-      
-      // oh yeah that -1 is such a freakin' hack
     this(tptc.getHostName(), tptc.getName(), tptc.getPort()-1, peerURL, null, tptc, mh);
   }
   
+  /**
+   * Constructor
+   * @param host hostname for the local system
+   * @param name preferred RMI-Registration name for the WVM
+   * @param port preferred port number for the WVM
+   * @param peerURL WVM-style URL for remote node to connect to
+   * @param tptc container object for this node's information
+   * @param mh callback-style messageHandler for handling messages
+   *  received through the WVM
+   */
   public CloudNode(String host, String name, int port,
                     String peerURL,
                     TPTransportContainer tptc,
@@ -85,10 +103,26 @@ public class CloudNode implements Runnable {
     this(host, name, port, null, peerURL, tptc, mh);
   }
 
+  /**
+   * Constructor
+   * @param peerURL WVM-style URL for remote node to connect to
+   */
   private CloudNode(String capabilityFile, String peerURL) {
     this(null, null, 0, capabilityFile, peerURL, null, null);
   }
 
+  /**
+   * Constructor
+   * @param host hostname for the local system
+   * @param name preferred RMI-Registration name for the WVM
+   * @param port preferred port number for the WVM
+   * @param peerURL WVM-style URL for remote node to connect to
+   * @param capabilityFile local filesystem URI for configuration file
+   *  for specifying this processor's capabilities
+   * @param tptc container object for this node's information
+   * @param mh callback-style messageHandler for handling messages
+   *  received through the WVM
+   */
   private CloudNode(String host, String name, int port, String peerURL,
                     String capabilityFile,
                     TPTransportContainer tptc,
@@ -114,6 +148,7 @@ public class CloudNode implements Runnable {
     if (psl.survivor.ProcessorMain.debug) System.out.println("WVMPORT:" + _wvm.getWVMPort());
     
     _wvm.requestHandler = new Runnable() {
+      /** Request handler for messages received via the local WVM */
       public void run() {
         Integer i = new Integer(Thread.currentThread().hashCode());
         Object messageType = _wvm.messageQueueKeys.get(i);
@@ -129,9 +164,10 @@ public class CloudNode implements Runnable {
           System.out.println("Current nodes: " + printCapabilities());
           
         } else if (messageType.equals(REPLICATE_REQ)) {
+          // subsumed by the logic within MessageHandler
 
-          new Exception().printStackTrace(WVM.out);
-          WVM.out.println("THIS SHOULD NOT HAPPEN!!! " + REPLICATE_REQ);
+          // new Exception().printStackTrace(WVM.out);
+          // WVM.out.println("THIS SHOULD NOT HAPPEN!!! " + REPLICATE_REQ);
 
           // someone asked me to replicate their data
           CompositeData cd = (CompositeData) _wvm.messageQueueMsgs.get(uniqueKey);
@@ -148,9 +184,10 @@ public class CloudNode implements Runnable {
           // might want to return an ACK to the sender!
         
         } else if (messageType.equals(RETRIEVE_REQ)) {
+          // subsumed by the logic within MessageHandler
 
-          new Exception().printStackTrace(WVM.out);
-          WVM.out.println("THIS SHOULD NOT HAPPEN!!! " + RETRIEVE_REQ);
+          // new Exception().printStackTrace(WVM.out);
+          // WVM.out.println("THIS SHOULD NOT HAPPEN!!! " + RETRIEVE_REQ);
 
           // someone asked for data that I've replicated for someone
           CompositeData cd = (CompositeData) _wvm.messageQueueMsgs.get(uniqueKey);
@@ -164,12 +201,14 @@ public class CloudNode implements Runnable {
           if (_msgHandler != null) _msgHandler.handleMessage(o);
 
         } else {
-          // 2-do: silly-ass comment
+          // nothing here!
         }
       }
     };
     
     if (peerURL != null) {
+      // have been instructed to connect to a peer cloudNode
+
       // send own capability to peer
       _wvm.sendMessage(CAPABILITY_RESP, _capability, peerURL);
       
@@ -211,13 +250,17 @@ public class CloudNode implements Runnable {
     */
   }
 
+  /** default message-sending function */
   public boolean sendMessage(String peerURL, Serializable s) {
     return _wvm.sendMessage(GENERAL_MESSAGE, s, peerURL);
   }
 
   private static final int WAIT_TIMEOUT = 1000;
   private boolean _shuttingDown = false;
-  
+
+  /**
+   * @deprecated
+   */
   public void run() {
     /* DISCONTINUED USE ... 
     while (! _shuttingDown) {
@@ -231,6 +274,8 @@ public class CloudNode implements Runnable {
     }
     */
   }
+
+  /** invoke shutdown on the WVM  */
   void shutdown() {
     if (_wvm.isAlive()) _wvm.shutdown();
     /* DISCONTINUED USE ... 
@@ -240,6 +285,10 @@ public class CloudNode implements Runnable {
     */
   }
   
+  /** 
+   * for internal use: display the other nodes that this 
+   * current is aware of
+   */
   private String printCapabilities() {
     String peers = "";
     for (Enumeration e = _peers.elements(); e.hasMoreElements(); )
@@ -253,6 +302,10 @@ public class CloudNode implements Runnable {
            "\n - wvm: " + printCapabilities();
   }
   
+  /**
+   * @deprecated
+   * main method used for initial testing
+   */
   public static void main(String args[]) {
     WVM.out.println("usage: java wfruntime.psl.CloudNode " + 
                        "[-c <capabilities>] " +
@@ -270,7 +323,11 @@ public class CloudNode implements Runnable {
     }
     WVM.out.print(new CloudNode(capabilities, peer));
   }
-  
+
+  /**
+   * @deprecated
+   * usage for initial testing purposes
+   */
   private static void usage() {
     WVM.out.println("usage: java psl.survivor.net.CloudNode " +
                     "[-c <capabilities file>]" +
