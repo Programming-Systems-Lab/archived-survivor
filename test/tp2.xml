@@ -1,3 +1,0 @@
-<TaskProcessor name="tp2" RMIName="blah" TCPPort="8011" WorkflowDefinitionPath="/home/gskc/wdf/td.xml">
-<Capability name="taskA" value="true"/>
-</TaskProcessor>
