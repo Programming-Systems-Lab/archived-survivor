@@ -12,8 +12,8 @@ Overview
 psl.survivor.* (survivor) is a non-workflow-implementation-specific
 survivable framework for executing workflows.
 
-The inital build contains a psl.survivor.nrl package, providing a
-survivable adaptation of the framework for the Navy Research Lab's
+The initial build contains a psl.survivor.nrl package, providing a
+survivable adaptation of the framework for the Naval Research Lab's
 workflow system.
 
 Survivability is achieved by using Replicator Nodes that are
@@ -28,7 +28,8 @@ to an ancestor version of that branch.
 
 Survivor also uses mobile agents (psl.worklets) for communication
 aspects between different processors. The idea being that smart agents
-can be used to move version objects and restart the workflow.
+infrastructure can be used to move version objects and restart the
+workflow.
 
 
 Testing
@@ -40,7 +41,7 @@ system.
 
 In the future, we would like to test the survivablity of the system on
 a non-connected graph representation of the workflow processors.  See
-Survivor, SurvivorNG and Survivor007 papers for more details.
+Survivor, Survivor-NG and Survivor-007 papers for more details.
 
 
 Development
@@ -55,8 +56,8 @@ extension of survivor. Following is a package overview.
 o todo.txt - list of future changes (todo) and changes recently
 implemented (done)
 
-o ProcessorMain.java - run an individual workflow processor and have
-it join a group of processors ready to execute a workflow
+o ProcessorMain.java - run an individual workflow processor and optionally
+have it join a group of processors ready to execute a workflow
 
 
 *** psl.survivor.net:
@@ -66,11 +67,11 @@ between different Task Processors.
 o Capability.java - encapsulates the various task-processing
 capabilities of a Processor
 
-o CloudNode.java - code actually responsible for using worklets to
-communicate. This object represents the local Processor(s) objects in the
-overlaid network created for data-replication purposes. It uses the
-asynchronous message-passing mechanism among peer WVMs to assist in the
-transfer of data, and control during the workflow execution.
+o CloudNode.java - code actually responsible for using Worklet Virtual
+Machines (WVM) for communication. This object represents the local
+Processor(s) objects in the overlaid network created for data-replication
+purposes. It uses the asynchronous message-passing mechanism among peer WVMs
+to assist in the transfer of data, and control during the workflow execution.
 
 o CompositeData.java - 
 
@@ -84,13 +85,13 @@ transport data from one Processor to another.
 
 
 *** psl.survivor.proc:
-This package most of the classes responsible for implementating
-survivable Processing (aka executing workflows) and replication
-(keeping track of the workflow and making sure its execution reaches
-termination)
+This package contains most of the classes responsible for
+implementating survivable Processing (aka executing workflows) and
+replication (keeping track of the workflow and making sure its
+execution reaches termination)
 
 o PoolData.java - used by processor to store its knowledge of other
-Processors and Replicators. A Pooldata object does not necessarly
+Processors and Replicators. A PoolData object does not necessarly
 contain information about every Processor in existence, just the ones
 that the local processor knows about. Between all of the Processors'
 PoolData, it is possible to get a representation of the complete
@@ -115,7 +116,7 @@ them. Processors use ReplicatorHandles to announce how local task
 executions are going.
 
 o TaskDefinition.java - Internal representation of a taskdefinition
-xml-document. Task definitions give additonal requirements that a
+xml-document. Task definitions give additional requirements that a
 processor needs to have in order to be able to execute a certain task
 
 o TaskProcessorHandle.java - A handle to a processor (which may be
@@ -171,7 +172,7 @@ This package provides utility classes for parsing xml documents and
 creating java objects.
 
 o ProcessorBuilder.java - From a Processor Capabilities xml, creates a
-Processor listenning on the correct ports, and using the correct
+Processor listennng on the correct ports, and using the correct
 extension of the Processor class. Used by ProcessorMain.java
 
 o TaskDefinitionBuilder.java - From a workflow description xml,
@@ -185,11 +186,12 @@ were used for testing purposes.
 Changes to the original system
 ------------------------------
 
-ServiceHost_Serv.java in the original system is the network-aware part of each
-task processor, and it uses Java-RMI for communication with other processors
-in the workflow. Due to the nature of the system design, we required the
-ServiceHost_Serv implementation in the psl.survivor system to have a slight
-variation, viz. if ServiceHost_Serv detects that it is running as part of a
-psl.survivor runtime, it would extract and use a data item hidden in one of
-the parameters to its method that is invoked when setting up the rmi
-registration for the task processor.
+ServiceHost_Serv.java in the original system is the network-aware part
+of each task processor, and it uses Java-RMI for communication with
+other processors in the workflow. Due to the nature of the system
+design, we required the ServiceHost_Serv implementation in the
+psl.survivor system to have a slight variation, viz. if
+ServiceHost_Serv detects that it is running as part of a psl.survivor
+runtime, it would extract and use a data item hidden in one of the
+parameters to one of its methods. This particular method is actually
+invoked when setting up the rmi registration for the task processor.

@@ -1,8 +1,10 @@
 Report on the first iteration of the Survivor-NG system
 -------------------------------------------------------
 
+
 Authors:  Gaurav S. Kc (gskc@cs.columbia.edu)
           Jean-Denis Greze (jg253@cs.columbia.edu)
+
 
 Overview
 --------
@@ -39,7 +41,7 @@ majority of the changes to the runtime system were related to porting
 the system to a UNIX platform, e.g. replacing the hardcoded '\' as the
 filesystem separator with java.io.File.separatorChar, increasing the
 accessibility of certain member variables and methods in the key classes of
-the runtime systeme, etc.
+the runtime system, etc.
 
 The following are those files in the original MLS workflow editor and
 runtime systems that had relatively minor changes made to them:
