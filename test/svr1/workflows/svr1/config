@@ -1,0 +1,6 @@
+StartTask start
+MonitorHost riverside-3 5000
+TaskAssignments 3
+end null:5000
+middle null:5000
+start null:5000
