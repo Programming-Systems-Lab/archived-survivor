@@ -29,17 +29,36 @@ import java.util.Hashtable;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 
+/**
+ *
+ * NRL's taskProcessor-specific implementation of psl.survivor.Processor.
+ * This class translates an @see(executeTaskLocal) method invocation, and provides the
+ * mapping to NRL's transition(..) function that actually executes the task
+ * 
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu)
+ * @author Gaurav S. Kc (gskc@cs.columbia.edu)
+ * 
+ */
 public class NRLProcessor extends Processor {
 
+  /** to transfer results of task execution */
   private final Hashtable _resultDataStorage = new Hashtable();
 
+  /** NRL-specific: filesystem reference to location of execution specifiles */
   private final String wfDefPath;
+
+  /** alias for wfDefPath */
   private final String wfRootDir;
+
+  /** port that the local rmiRegistry for the WVM is running */
   private final int rmiPort;
   
+  /** singleton NRL serviceHost object that will create schedulers for each task */
   private NRLServiceHost _serviceHost = null;
 
   // BEGIN: Inherited from psl.survivor.proc.Processor /////////////////////////
+
+  /** Initialise and setup processor */
   public NRLProcessor(String name, int tcpPort, String rmiName, 
                       String wfDefPath) {
     super(name, tcpPort, rmiName, wfDefPath);
@@ -50,6 +69,13 @@ public class NRLProcessor extends Processor {
 
   }
 
+  /**
+   * abstract function inherited from superclass
+   *  - extracts NRL-style input data for the local task, 
+   *  - passes control to the NRL serviceHost, scheduler
+   *  - waits for the data resulting from the execution, 
+   *    and returns this
+   */
   protected Version executeTaskLocal(Version theTask) {
     if (psl.survivor.ProcessorMain.debug) System.out.println("CORRECT\n\n\n");
 
@@ -59,7 +85,7 @@ public class NRLProcessor extends Processor {
     try {
       // copied from WFLoader
       // 2/20/2002: converted from resetTask(thisTaskName) into resetTask(processData)
-      resetTask(processData);
+      resetTask(processData); // this eventually gets the task to get executed
       
       // 2/20/2002, Gskc: the call to transition has been moved into resetTask
     } catch (Throwable t) {
@@ -74,6 +100,7 @@ public class NRLProcessor extends Processor {
     while (resultData == null) {
       resultData
         = (NRLProcessData) _resultDataStorage.get(instanceId.toString());
+      // retrieve the output data of the task execution
       try {
 	  Thread.sleep(500);
       } catch (Exception e) {
@@ -82,29 +109,18 @@ public class NRLProcessor extends Processor {
     }
     _resultDataStorage.remove(instanceId.toString());
 
-    if (resultData == null) {
-      if (psl.survivor.ProcessorMain.debug) System.out.println("resultData is null");
-    } else {
-      if (psl.survivor.ProcessorMain.debug) System.out.println("resultData is NOT null");
-    }
-
-    if (resultData.workflowName.equals("END")) {
-	System.out.println("WE ARE AT THE END");
-	return null;
-    } 
-
-    /*    TaskDefinition td = new TaskDefinition(resultData.nextTaskName);
-	  td.addRequirement(new NameValuePair(resultData.nextTaskName, "true"));*/
+    if (resultData.workflowName.equals("END")) return null;
     TaskDefinition td = _workflowData.getTaskDefinition(resultData.nextTaskName);
-    
-    Version result = theTask.split2(td, resultData); // ya had these reversed :)
-    
-    if (psl.survivor.ProcessorMain.debug) if (result == null) System.out.println("|||||||||||\\\\\\ bad");
-
-    System.out.println(" - - - - - - - - - - - PSL! executeTaskLocal returning version> " + result);
+    Version result = theTask.split2(td, resultData);
+    // System.out.println(" - - - - - - - - - - - PSL! executeTaskLocal returning version> " + result);
     return result;
   }
 
+  /**
+   * Initialising directive to start the specified workflow
+   * @param wfName_iKey: string composed of the NRL-specific
+   *  workflowName and instanceIdentifier
+   */
   public void startWorkflow(String wfName_iKey) {
     log(_processorName);
     log(_tcpPort);
@@ -113,8 +129,9 @@ public class NRLProcessor extends Processor {
     for	(int i=0; i<_capabilities.size(); i++) {
       log(_capabilities.get(i).toString());
     }
+    
     /**
-    * TODO: need to do what WFManager does
+    * This does what the WFManager does
     * ConfigInfo, StartTask, StartHost, InstanceKey, InitialBindings(empty), StartNode->transition();
     * Notes: need different behaviour for top-level WFManager, and 
     * nested WFManagers ... mainly to do with bindings, schedulers, etc
@@ -150,9 +167,10 @@ public class NRLProcessor extends Processor {
     npd.nextTaskName = _startTask;
     npd.paramTable = new Hashtable();
 
+    // construct the input data for the first task
     Version	v	=	new	Version(td);
     v.setData2(npd);
-    log("PSL!	going	to invoke	executeRemoteTask(...)");	// 2-do: remove
+    // log("PSL!	going	to invoke	executeRemoteTask(...)");
     executeRemoteTask(v);
   }
 
@@ -192,7 +210,12 @@ public class NRLProcessor extends Processor {
           
           // BEGIN: Scheduler_Serv
           _scheduler = new Scheduler_Serv(name, theSpecs, thePerms, creates, 
-              rmiPort, dTypes, exceptions, namePrefix, theConfig, fTypes, rinfo) {    
+              rmiPort, dTypes, exceptions, namePrefix, theConfig, fTypes, rinfo) {
+                /**
+                 * Inhertited from wfruntime.Scheduler_Serv
+                 * - utilises the NRL-specific task-execution output to 
+                 *   prepare the input data for the next task
+                 */
             protected void fireNextTask(Output theOut, String state, Hashtable outBindings, Object instanceId) throws Throwable {
               if (psl.survivor.ProcessorMain.debug) System.out.println("fireNextTask ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
               if (!(theOut.getTask().equals("END"))) {
@@ -212,7 +235,6 @@ public class NRLProcessor extends Processor {
 
               } else {
                 // 2-do: transition to end task
-		  new Exception().printStackTrace(); System.out.println("FUCKA"); System.out.println("FUCKA"); 
                 NRLProcessData resultData = new NRLProcessData();    
                 resultData.workflowName = "END";
 
@@ -328,6 +350,9 @@ public class NRLProcessor extends Processor {
     }
   }
 
+  /**
+   * load the bytecode for specified classFile necessary for execution
+   */
   private static byte[] readClassFile(File theFile) throws Throwable {
     FileInputStream in = new FileInputStream(theFile);
     byte[] returnObj = new byte[(int)theFile.length()];
@@ -338,6 +363,9 @@ public class NRLProcessor extends Processor {
 
   // ENDED: Copied from wfruntime.psl.PSLWFLoader //////////////////////////////
   
+  /**
+   * helper class to achieve compatiblity with the NRL system
+   */
   class NRLServiceHost extends ServiceHost_Serv {
     Scheduler_Serv _scheduler = null;
     NRLServiceHost(int rmiPort, String wfDefPath) throws Throwable {
@@ -346,7 +374,3 @@ public class NRLProcessor extends Processor {
   }
   
 }
-
-
-
-
