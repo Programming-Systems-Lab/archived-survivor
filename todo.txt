@@ -1,3 +1,6 @@
+- add to processorMain: 
+  - listen on a service port so that the node can be used to start workflow
+
 - fix problem when a remoteTaskProcessor is really local (make it be a local
   call instead of using worklets)
 - extract WF-Name from the XML file, and make available to Processor.java
