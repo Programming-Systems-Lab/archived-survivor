@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE NetworkDesign SYSTEM "file:///C:\workflow\newdesigner\batchfiles\..\..\..\workflow\newdesigner\dtd\networkdesign.dtd">
+
+<NetworkDesign>
+  <Task securitydomainurl="/DefaultDomain.xml#Secret" name="svr1" id="svr1" y="10" x="10">
+    <Realization>
+      <NetworkTaskRealization realizationtype="NonTransactionalNetwork" lasttask="NonTransactional3" firsttask="NonTransactional0">
+        <Domain url="/DefaultDomain.xml#Secret" tasks=" NonTransactional0 NonTransactional1 NonTransactional3" y="18" id="Domain0.987324732984732" height="203" width="423" x="21">
+        </Domain>
+        <InputMappingList>
+        </InputMappingList>
+        <OutputMappingList>
+        </OutputMappingList>
+      </NetworkTaskRealization>
+    </Realization>
+  </Task>
+  <Task securitydomainurl="/DefaultDomain.xml#Secret" name="start" id="NonTransactional0" outarcs=" Arc0.699223343794236 " y="60" x="29">
+    <Realization>
+      <SimpleRealization>
+        <NonTransactionalTaskRealization>
+          <CorbaInvocation objectmarker="null" classname="null" serverhost="null" returnvalue="null" methodname="null" servername="null">
+            <ForwardMappingList>
+            </ForwardMappingList>
+            <ReverseMappingList>
+            </ReverseMappingList>
+          </CorbaInvocation>
+        </NonTransactionalTaskRealization>
+      </SimpleRealization>
+    </Realization>
+  </Task>
+  <Task securitydomainurl="/DefaultDomain.xml#Secret" name="middle" id="NonTransactional1" outarcs=" Arc0.3472007670199193 " inarcs=" Arc0.699223343794236 " y="60" x="184">
+    <Realization>
+      <SimpleRealization>
+        <NonTransactionalTaskRealization>
+          <CorbaInvocation objectmarker="null" classname="null" serverhost="null" returnvalue="null" methodname="null" servername="null">
+            <ForwardMappingList>
+            </ForwardMappingList>
+            <ReverseMappingList>
+            </ReverseMappingList>
+          </CorbaInvocation>
+        </NonTransactionalTaskRealization>
+      </SimpleRealization>
+    </Realization>
+  </Task>
+  <Task securitydomainurl="/DefaultDomain.xml#Secret" name="end" id="NonTransactional3" inarcs=" Arc0.3472007670199193 " y="60" x="329">
+    <Realization>
+      <SimpleRealization>
+        <NonTransactionalTaskRealization>
+          <CorbaInvocation objectmarker="null" classname="null" serverhost="null" returnvalue="null" methodname="null" servername="null">
+            <ForwardMappingList>
+            </ForwardMappingList>
+            <ReverseMappingList>
+            </ReverseMappingList>
+          </CorbaInvocation>
+        </NonTransactionalTaskRealization>
+      </SimpleRealization>
+    </Realization>
+  </Task>
+  <Arc arctype="Success" destination="NonTransactional1" id="Arc0.699223343794236" source="NonTransactional0">
+  </Arc>
+  <Arc arctype="Success" destination="NonTransactional3" id="Arc0.3472007670199193" source="NonTransactional1">
+  </Arc>
+</NetworkDesign>

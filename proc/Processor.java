@@ -7,17 +7,17 @@ import psl.survivor.util.*;
 import psl.survivor.net.*;
 public class Processor implements Runnable {
 
-    private String _processorName;
-    private int _tcpPort;
-    private String _wfDefPath;
-    private String _rmiName;
-    private String _hostname;
+    protected String _processorName;
+    protected int _tcpPort;
+    protected String _wfDefPath;
+    protected String _rmiName;
+    protected String _hostname;
 
     private VersionCache _versionCache;
     private Vector _taskQueue;
     private Vector _replicatorQueue;
     private PoolData _poolData;
-    private ArrayList _capabilities;
+    protected ArrayList _capabilities;
     private WorkflowData _workflowData;
     private MessageHandler _messageHandler;
 
@@ -146,7 +146,7 @@ public class Processor implements Runnable {
 	return null;
     }
 
-    private void executeRemoteTask(final Version theTask) {
+    protected void executeRemoteTask(final Version theTask) {
 	TaskDefinition td = (TaskDefinition) theTask.data();
 	ArrayList al = _poolData.getValidProcessors(td);
 	for (int i = 0; i < al.size(); i++) {
@@ -241,10 +241,10 @@ public class Processor implements Runnable {
     public boolean ping() { return true; }
     public boolean valid() { return true; }
 
-    private void log(String s) {
+    protected void log(String s) {
 	System.err.println(s);
     }
-    private void log(int i) {
+    protected void log(int i) {
 	System.err.println(i);
     }
 

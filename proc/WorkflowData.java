@@ -13,7 +13,7 @@ public class WorkflowData {
     public WorkflowData(String wfDefPath) {
 	_wfDefPath = wfDefPath;
 	TaskDefinitionBuilder tdb = 
-	    new TaskDefinitionBuilder(wfDefPath);
+	    new TaskDefinitionBuilder(wfDefPath + "/td.xml");
 	_taskDefinitions = tdb.getTaskDefinitions();
 
 	for (int i = 0; i < _taskDefinitions.size(); i++) {

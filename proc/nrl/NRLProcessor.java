@@ -149,7 +149,28 @@ public class NRLProcessor extends Processor {
 
     return result;
   }
-  // ENDED: Inherited from psl.survivor.proc.Processor /////////////////////////
+
+  public void startWorkflow() {
+        log(_processorName);
+	log(_tcpPort);
+	log(_wfDefPath);
+	for (int i = 0; i < _capabilities.size(); i++) {
+	    log(_capabilities.get(i).toString());
+	}
+	// TODO actually start the first task on an appropriate host
+	TaskDefinition td = new TaskDefinition("START");
+	NRLProcessData npd = new NRLProcessData();
+	npd.instanceId = new Integer(5); // TODO fix
+	npd.originTask = "START";
+	npd.state = "Success";
+	npd.nextTaskName = null;
+	npd.paramTable = new Hashtable();
+        Version v = new Version(td);
+	v.setData2(npd);
+	executeRemoteTask(v);
+  }
+
+// ENDED: Inherited from psl.survivor.proc.Processor /////////////////////////
 
   // BEGIN: Copied from wfruntime.psl.PSLWFLoader //////////////////////////////
   /**
