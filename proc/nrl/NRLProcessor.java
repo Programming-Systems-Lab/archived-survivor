@@ -22,6 +22,7 @@ public class NRLProcessor extends Processor {
 
   private ServiceHost_Serv _serviceHost;
   private Scheduler_Serv _scheduler;
+  private final Hashtable _resultDataStorage = new Hashtable();
 
   // BEGIN: Inherited from psl.survivor.proc.Processor /////////////////////////
   public NRLProcessor(String name, int tcpPort, String rmiName, 
@@ -43,7 +44,7 @@ public class NRLProcessor extends Processor {
                                    Hashtable fTypes,
                                    IRealizationInfo rinfo)
           throws RemoteException {
-          Scheduler_Serv scheduler
+          Scheduler_Serv scheduler = _scheduler
             = new Scheduler_Serv(name,
                                  theSpecs,
                                  thePerms,
@@ -59,30 +60,22 @@ public class NRLProcessor extends Processor {
                                         String state,
                                         Hashtable outBindings,
                                         Object instanceId) throws Throwable {
-              IScheduler dest = null;
               if (!(theOut.getTask().equals("END"))) {
-                /*
-                _hostAdapter.executeTransition(namePrefix,
-                                               theOut.getTask(),
-                                               instanceId,
-                                               name,
-                                               state,
-                                               outBindings);
-                */
-              } else {
-                // WE PROBABLY WANT TO CHANGE THIS TOO SO THAT THE
-                // ENDWORKFLOW CALL ALSO GOES THROUGH THE hostAdapter
-  
-                /* IWFManager man =
-                 * (IWFManager)Naming.lookup("rmi://"+theConfig.getManagerHost()+"/"+
-                 * namePrefix+"_"+instanceId); man.endWorkflow(null, outBindings);
-                 * */
+                Hashtable paramTable = outBindings;
+                String originTask = this.name; // this task is the next 'originTask'
                 
-                // _hostAdapter.executeEndofWorkflow(instanceId, outBindings);
-                /* _hostAdapter.executeTransition(namePrefix,
-                 * theConfig.getManagerHost(), instanceId, name, state,
-                 * outBindings); */
-              }
+                NRLProcessData resultData = new NRLProcessData();
+                resultData.instanceId = instanceId;
+                resultData.originTask = originTask;
+                resultData.state = state;
+                resultData.paramTable = paramTable;
+
+                // instanceId.toString() will be used as key!
+                _resultDataStorage.put(instanceId.toString(), resultData);
+
+              } else {
+                // 2-do: transition to end task
+             }
             }   
           }; // ENDED: Scheduler_Serv
   
@@ -100,9 +93,28 @@ public class NRLProcessor extends Processor {
 
   protected Version executeTaskLocal(Version theTask) {
     // NEED TO INTERACT WITH NRL'S CODE HERE
-    return null;
+
+    NRLProcessData processData = (NRLProcessData) theTask.data();
+
+    // need to get the following from 'taskData'
+    Object instanceId = processData.instanceId;
+    String originTask = processData.originTask;
+    String state = processData.state;
+    Hashtable paramTable = processData.paramTable;
+
+    try {
+      _scheduler.transition(instanceId, originTask, state, paramTable);
+    } catch (RemoteException re) {
+      // left here for backwards compatibility
+    }
+
+    NRLProcessData resultDat
+      = (NRLProcessData) _resultDataStorage.get(instanceId.toString());
+    // todo: check the semantics of the following statement, jd
+    Version result = theTask.split(processData);
+
+    return result;
   }
   // ENDED: Inherited from psl.survivor.proc.Processor /////////////////////////
 
 }
-
