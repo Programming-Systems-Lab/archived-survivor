@@ -1,3 +1,4 @@
+package psl.survivor.net;
 public class MessageHandler {
     public MessageHandler(Processor p) {}
     public static void handleMessage(Object o) {

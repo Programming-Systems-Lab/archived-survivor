@@ -1,4 +1,4 @@
-package wfruntime.psl;
+package psl.survivor.net;
 
 import psl.worklets.WVM;
 

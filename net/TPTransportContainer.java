@@ -1,3 +1,5 @@
+package psl.survivor.net;
+
 import java.util.ArrayList;
 import java.io.Serializable;
 /**

@@ -1,3 +1,4 @@
+package psl.survivor.util;
 public class NameValuePair implements Comparable {
     private Comparable _name;
     private Comparable _value;

@@ -1,3 +1,5 @@
+package psl.survivor.proc;
+
 import java.util.ArrayList;
 
 public class TaskDefinition {
