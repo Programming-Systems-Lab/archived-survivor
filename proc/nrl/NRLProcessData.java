@@ -7,5 +7,6 @@ public class NRLProcessData implements Serializable {
   Object instanceId = null;
   String originTask = null;
   String state = null;
+  String nextTaskName = null;
   Hashtable paramTable = null;
 }

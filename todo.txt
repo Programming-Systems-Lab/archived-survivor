@@ -14,3 +14,4 @@
   over the place.
 - swap the semantics meaning between valid and ping! It's currently
   the opposite of what it should be.
+- get rid of 2 objects in Version object

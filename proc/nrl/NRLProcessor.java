@@ -3,7 +3,8 @@ package psl.survivor.proc.nrl;
 import psl.worklets.WVM_Host;
 
 import psl.survivor.util.Version;
-import psl.survivor.proc.Processor;
+import psl.survivor.proc.*;
+import psl.survivor.util.*;
 
 import wfruntime.Output;
 import wfruntime.IScheduler;
@@ -27,48 +28,50 @@ public class NRLProcessor extends Processor {
   // BEGIN: Inherited from psl.survivor.proc.Processor /////////////////////////
   public NRLProcessor(String name, int tcpPort, String rmiName, 
                       String wfDefPath) {
-    super(name, tcpPort, rmiName, wfDefPath);
-
-    final int rmiPort = WVM_Host.PORT;
-    // BEGIN: Inherited from wfruntime.ServiceHost_Serv ///
-    try {
-      _serviceHost = new ServiceHost_Serv(rmiPort, wfDefPath) {
-        public void beginScheduler(String name,
-                                   RoutingInfo theSpecs,
-                                   HashSet thePerms,
-                                   Hashtable creates,
-                                   Hashtable dTypes,
-                                   Hashtable exceptions,
-                                   String namePrefix,
-                                   ConfigInfo theConfig,
-                                   Hashtable fTypes,
-                                   IRealizationInfo rinfo)
-          throws RemoteException {
-          Scheduler_Serv scheduler = _scheduler
-            = new Scheduler_Serv(name,
-                                 theSpecs,
-                                 thePerms,
-                                 creates,
-                                 rmiPort,
-                                 dTypes,
-                                 exceptions,
-                                 namePrefix,
-                                 theConfig,
-                                 fTypes,
-                                 rinfo) {
-            protected void fireNextTask(Output theOut,
-                                        String state,
-                                        Hashtable outBindings,
-                                        Object instanceId) throws Throwable {
-              if (!(theOut.getTask().equals("END"))) {
-                Hashtable paramTable = outBindings;
-                String originTask = this.name; // this task is the next 'originTask'
-                
-                NRLProcessData resultData = new NRLProcessData();
-                resultData.instanceId = instanceId;
-                resultData.originTask = originTask;
-                resultData.state = state;
-                resultData.paramTable = paramTable;
+      super(name, tcpPort, rmiName, wfDefPath);
+      
+      final int rmiPort = WVM_Host.PORT;
+      // BEGIN: Inherited from wfruntime.ServiceHost_Serv ///
+      try {
+	  _serviceHost = new ServiceHost_Serv(rmiPort, wfDefPath) {
+		  public void beginScheduler(String name,
+					     RoutingInfo theSpecs,
+					     HashSet thePerms,
+					     Hashtable creates,
+					     Hashtable dTypes,
+					     Hashtable exceptions,
+					     String namePrefix,
+					     ConfigInfo theConfig,
+					     Hashtable fTypes,
+					     IRealizationInfo rinfo)
+		      throws RemoteException {
+		      Scheduler_Serv scheduler = _scheduler
+			  = new Scheduler_Serv(name,
+					       theSpecs,
+					       thePerms,
+					       creates,
+					       rmiPort,
+					       dTypes,
+					       exceptions,
+					       namePrefix,
+					       theConfig,
+					       fTypes,
+					       rinfo) {
+				  protected void fireNextTask(Output theOut,
+							      String state,
+							      Hashtable outBindings,
+							      Object instanceId) throws Throwable {
+				      if (!(theOut.getTask().equals("END"))) {
+					  Hashtable paramTable = outBindings;
+					  String originTask = this.name; // this task is the next 'originTask'
+					  
+					  NRLProcessData resultData = new NRLProcessData();
+					  resultData.instanceId = instanceId;
+					  resultData.originTask = originTask;
+					  resultData.state = state;
+					  resultData.paramTable = paramTable;
+					  resultData.nextTaskName = 
+					      theOut.getTask();
 
                 // instanceId.toString() will be used as key!
                 _resultDataStorage.put(instanceId.toString(), resultData);
@@ -92,8 +95,7 @@ public class NRLProcessor extends Processor {
   }
 
   protected Version executeTaskLocal(Version theTask) {
-    // todo: check the semantics of the following statement, jd
-    NRLProcessData processData = (NRLProcessData) theTask.data();
+    NRLProcessData processData = (NRLProcessData) theTask.data2();
 
     // need to get the following from 'taskData'
     Object instanceId = processData.instanceId;
@@ -101,6 +103,7 @@ public class NRLProcessor extends Processor {
     String state = processData.state;
     Hashtable paramTable = processData.paramTable;
 
+    // TODO need to fix the instanceId to be unique per task, not workflow
     try {
       _scheduler.transition(instanceId, originTask, state, paramTable);
     } catch (RemoteException re) {
@@ -110,8 +113,10 @@ public class NRLProcessor extends Processor {
     NRLProcessData resultData
       = (NRLProcessData) _resultDataStorage.get(instanceId.toString());
 
-    // todo: check the semantics of the following statement, jd
-    Version result = theTask.split(resultData);
+    TaskDefinition td = new TaskDefinition(resultData.nextTaskName);
+    td.addRequirement(new NameValuePair("tn", resultData.nextTaskName));
+
+    Version result = theTask.split2(resultData, td);
 
     return result;
   }

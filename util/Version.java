@@ -9,6 +9,7 @@ import java.io.Serializable;
 public class Version implements Comparable, Serializable {
 
     private Object _data;
+    private Object _data2;
     private ArrayList _identifiers;
 
     /**
@@ -25,6 +26,17 @@ public class Version implements Comparable, Serializable {
      */
     public Object data() {
 	return _data;
+    }
+
+    /**
+     * returns the data2 that this version is associated with
+     */
+    public Object data2() {
+	return _data2;
+    }
+
+    public void setData2(Object o) {
+	_data2 = o;
     }
 
     /**
@@ -139,6 +151,19 @@ public class Version implements Comparable, Serializable {
 	for (int i = 0; i < _identifiers.size(); i++) {
 	    returnValue.append((Comparable)_identifiers.get(i));
 	}
+	return returnValue;
+    }
+
+    /** 
+     * Clone this version, and make clone version that now refers to object o1
+     * as data and object o2 as data2;
+     */
+    public Version split2(Object o1, Object o2) {
+	Version returnValue = new Version(o1);
+	for (int i = 0; i < _identifiers.size(); i++) {
+	    returnValue.append((Comparable)_identifiers.get(i));
+	}
+	returnValue.setData2(o2);
 	return returnValue;
     }
     

@@ -82,8 +82,9 @@ public class Processor implements Runnable {
 
 	String taskName = ((TaskDefinition)theTask.data()).getName();
 	Version nextTask = executeTaskLocal(theTask);
-	nextTask.append(_processorName+":"+taskName+":"+
-			       (new Date()));
+	// versioning happens here
+	nextTask.append(taskName);
+
 	_versionCache.addVersion(nextTask);
 
 	replicate(nextTask);
