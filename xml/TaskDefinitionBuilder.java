@@ -17,7 +17,7 @@ public class TaskDefinitionBuilder {
     ArrayList _taskDefinitions = null;
 
     public TaskDefinitionBuilder(String xmlPath) {
-	System.out.println("xmlPath: " + xmlPath);
+	log("xmlPath: " + xmlPath);
 	
 	sxp = new SAXParser();
 	sxp.setContentHandler(new TaskDefinitionHandler(this));
@@ -33,10 +33,10 @@ public class TaskDefinitionBuilder {
 	}
     }  
     public void log(String s) {
-	System.err.println(s);
+	if (psl.survivor.ProcessorMain.debug) System.err.println(s);
     }
     public void log(int i) {
-	System.err.println(i);
+	if (psl.survivor.ProcessorMain.debug) System.err.println(i);
     }
     public ArrayList getTaskDefinitions() { return _taskDefinitions; }
     class TaskDefinitionHandler extends DefaultHandler {

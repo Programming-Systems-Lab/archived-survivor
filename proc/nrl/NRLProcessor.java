@@ -36,6 +36,7 @@ public class NRLProcessor extends Processor {
   private final Hashtable _resultDataStorage = new Hashtable();
 
   private final String wfRootDir;
+  private final String wfDefPath;
   private String wfName;
   private String namePrefix;
   
@@ -44,84 +45,23 @@ public class NRLProcessor extends Processor {
   // BEGIN: Inherited from psl.survivor.proc.Processor /////////////////////////
   public NRLProcessor(String name, int tcpPort, String rmiName, 
                       String wfDefPath) {
-      super(name, tcpPort, rmiName, wfDefPath);      System.out.println("NRLProcessor: " + name + ":" + tcpPort + "/" + rmiName);
+      super(name, tcpPort, rmiName, wfDefPath);
+      if (psl.survivor.ProcessorMain.debug) System.out.println("NRLProcessor: " + name + ":" + tcpPort + "/" + rmiName);
 
-      wfRootDir = wfDefPath;
+      wfRootDir = this.wfDefPath = wfDefPath;
       rmiPort = WVM_Host.PORT;
 
-      // BEGIN: Inherited from wfruntime.ServiceHost_Serv ///
-      try {
-	  _serviceHost = new ServiceHost_Serv(rmiPort, wfDefPath) {
-		  public void beginScheduler(String name,
-					     RoutingInfo theSpecs,
-					     HashSet thePerms,
-					     Hashtable creates,
-					     Hashtable dTypes,
-					     Hashtable exceptions,
-					     String namePrefix,
-					     ConfigInfo theConfig,
-					     Hashtable fTypes,
-					     IRealizationInfo rinfo)
-		      throws RemoteException {
-		      Scheduler_Serv scheduler = _scheduler
-			  = new Scheduler_Serv(name,
-					       theSpecs,
-					       thePerms,
-					       creates,
-					       rmiPort,
-					       dTypes,
-					       exceptions,
-					       namePrefix,
-					       theConfig,
-					       fTypes,
-					       rinfo) {
-				  protected void fireNextTask(Output theOut,
-							      String state,
-							      Hashtable outBindings,
-							      Object instanceId) throws Throwable {
-				      System.out.println("fireNextTask ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-				      if (!(theOut.getTask().equals("END"))) {
-					  Hashtable paramTable = outBindings;
-					  String originTask = this.name; // this task is the next 'originTask'
-					  
-					  NRLProcessData resultData = new NRLProcessData();
-					  resultData.instanceId = instanceId;
-					  resultData.originTask = originTask;
-					  resultData.state = state;
-					  resultData.paramTable = paramTable;
-					  resultData.nextTaskName = 
-					      theOut.getTask();
-
-                // instanceId.toString() will be used as key!
-					  System.out.println("FIRING NEXT TASK ***************************************************************************************************************************************");
-                _resultDataStorage.put(instanceId.toString(), resultData);
-
-              } else {
-                // 2-do: transition to end task
-             }
-            }   
-          }; // ENDED: Scheduler_Serv
-  
-          // Gskc: copied over from PSLServiceHost_Serv.java: 25 Dec 2001
-          // AMIT MOD **
-          if (theSpecs.getTaskType().equals("HumanRealization"))
-            humanTasks.put(name, scheduler);
-          // **
-        }
-  
-      }; // ENDED: ServiceHost_Serv
-    } catch (Throwable t) { }
-    // ENDED: Inherited from wfruntime.ServiceHost_Serv ///
   }
 
   protected Version executeTaskLocal(Version theTask) {
-      System.out.println("CORRECT\n\n\n");
+      if (psl.survivor.ProcessorMain.debug) System.out.println("CORRECT\n\n\n");
 
     NRLProcessData processData = (NRLProcessData) theTask.data2();
 
     // need to get the following from 'taskData'
     wfName = processData.workflowName;
-    namePrefix = wfName;    Object instanceId = processData.instanceId;
+    namePrefix = wfName;   
+    Object instanceId = processData.instanceId;
     String originTask = processData.originTask;
     String state = processData.state;
     Hashtable paramTable = processData.paramTable;
@@ -131,15 +71,17 @@ public class NRLProcessor extends Processor {
     // TODO need to fix the instanceId to be unique per task, not workflow
     try {
       resetTask(thisTaskName); // copied from WFLoader
-      log("PSL! returned from resetTask, now calling _scheduler.transition(...): instanceId: " + instanceId + ", originTask: " + originTask + ", state: " + state + ", paramTable: " + paramTable); // 2-do: remove
+      log("PSL! returned from resetTask, now calling _scheduler.transition(...): instanceId: " + instanceId + ", originTask: " + originTask + ", state: " + state + ", paramTable: " + paramTable + ", _scheduler: " + _scheduler); // 2-do: remove
   
       _scheduler.transition(instanceId, originTask, state, paramTable);
     } catch (RemoteException re) {
       // left here for backwards compatibility
       // possibly thrown by: _scheduler.transition(instanceId, originTask, state, paramTable);
+      re.printStackTrace();
     } catch (Throwable t) {
       // left here for backwards compatibility
       // possibly thrown by: resetTask(thisTaskName);
+      t.printStackTrace();
     }
     NRLProcessData resultData = null;
     while (resultData == null) {
@@ -149,9 +91,9 @@ public class NRLProcessor extends Processor {
     _resultDataStorage.remove(instanceId.toString());
 
     if (resultData == null) {
-	System.out.println("resultData is null");
+	if (psl.survivor.ProcessorMain.debug) System.out.println("resultData is null");
     } else {
-	System.out.println("resultData is NOT null");
+	if (psl.survivor.ProcessorMain.debug) System.out.println("resultData is NOT null");
     }
 
     /*    TaskDefinition td = new TaskDefinition(resultData.nextTaskName);
@@ -160,7 +102,7 @@ public class NRLProcessor extends Processor {
 
     Version result = theTask.split2(td, resultData); // ya had these reversed :)
 
-    if (result == null) System.out.println("|||||||||||\\\\\\ bad");
+    if (psl.survivor.ProcessorMain.debug) if (result == null) System.out.println("|||||||||||\\\\\\ bad");
 
     return result;
   }
@@ -226,22 +168,94 @@ public class NRLProcessor extends Processor {
    * and internally call beginScheduler(...) on the local scheduler
   */
   public void resetTask(String taskName) throws Throwable {
-System.out.println("4: GOT AS FAR AS HERE!!!, wfName: " + wfName + ", taskName: " + taskName);
+if (psl.survivor.ProcessorMain.debug) System.out.println("4: GOT AS FAR AS HERE!!!, wfName: " + wfName + ", taskName: " + taskName);
     final char sc = File.separatorChar;
     File              subDir      = new File(wfRootDir,"workflows"+sc+wfName+sc+taskName);
-    System.err.println("1");
-    System.err.println("2");    RoutingInfo       theRouting  = SpecParser.parseRouting(new File(subDir,"routing"));
-    System.err.println("3");    HashSet           thePerms    = SpecParser.parseDataPerms(new File(subDir,"dataperm"));
-    System.err.println("4");    Hashtable         creates     = SpecParser.parseCreates(new File(subDir,"creates"));
-    System.err.println("5");Hashtable         dTypes      = SpecParser.parseDataTypes(new File(subDir,"datatypes"));
-    System.err.println("6");    Hashtable         exceptions  = SpecParser.parseExceptions(new File(subDir,"exceptions"));
-    System.err.println("7");Hashtable         fTypes      = SpecParser.parseFieldTypes(new File(subDir,"fieldtypes"));
-    System.err.println("8");    IRealizationInfo  rinfo       = SpecParser.parseRealization(new File(subDir,"realization"));
-    System.err.println("9");
-    System.err.println("10");    IServiceHost theHost = (IServiceHost) Naming.lookup("rmi://localhost:" + rmiPort + "/serviceHost");
-    System.err.println("11");
-    System.err.println("12");    ConfigInfo theConfig = SpecParser.parseConfig(new File(wfRootDir, "workflows" + sc + wfName + sc + "config"));
-    System.err.println("13");
+    RoutingInfo       theRouting  = SpecParser.parseRouting(new File(subDir,"routing"));
+    HashSet           thePerms    = SpecParser.parseDataPerms(new File(subDir,"dataperm"));
+    Hashtable         creates     = SpecParser.parseCreates(new File(subDir,"creates"));
+    Hashtable         dTypes      = SpecParser.parseDataTypes(new File(subDir,"datatypes"));
+    Hashtable         exceptions  = SpecParser.parseExceptions(new File(subDir,"exceptions"));
+    Hashtable         fTypes      = SpecParser.parseFieldTypes(new File(subDir,"fieldtypes"));
+    IRealizationInfo  rinfo       = SpecParser.parseRealization(new File(subDir,"realization"));
+    
+
+      // BEGIN: Inherited from wfruntime.ServiceHost_Serv ///
+      try {
+	  _serviceHost = new ServiceHost_Serv(rmiPort, wfDefPath) {
+		  public void beginScheduler(String name,
+					     RoutingInfo theSpecs,
+					     HashSet thePerms,
+					     Hashtable creates,
+					     Hashtable dTypes,
+					     Hashtable exceptions,
+					     String namePrefix,
+					     ConfigInfo theConfig,
+					     Hashtable fTypes,
+					     IRealizationInfo rinfo)
+		      throws RemoteException {
+		      if (psl.survivor.ProcessorMain.debug) System.out.println("PSL! inside beginScheduler: creating new scheduler!!!");
+		      Scheduler_Serv scheduler = _scheduler
+			  = new Scheduler_Serv(name,
+					       theSpecs,
+					       thePerms,
+					       creates,
+					       rmiPort,
+					       dTypes,
+					       exceptions,
+					       namePrefix,
+					       theConfig,
+					       fTypes,
+					       rinfo) {
+				  protected void fireNextTask(Output theOut,
+							      String state,
+							      Hashtable outBindings,
+							      Object instanceId) throws Throwable {
+				      if (psl.survivor.ProcessorMain.debug) System.out.println("fireNextTask ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+				      if (!(theOut.getTask().equals("END"))) {
+					  Hashtable paramTable = outBindings;
+					  String originTask = this.name; // this task is the next 'originTask'
+					  
+					  NRLProcessData resultData = new NRLProcessData();
+					  resultData.workflowName = wfName;
+					  resultData.instanceId = instanceId;
+					  resultData.originTask = originTask;
+					  resultData.state = state;
+					  resultData.paramTable = paramTable;
+					  resultData.nextTaskName = 
+					      theOut.getTask();
+
+                // instanceId.toString() will be used as key!
+					  if (psl.survivor.ProcessorMain.debug) System.out.println("FIRING NEXT TASK ***************************************************************************************************************************************");
+                _resultDataStorage.put(instanceId.toString(), resultData);
+
+              } else {
+                // 2-do: transition to end task
+              }
+            }   
+          }; // ENDED: Scheduler_Serv
+  
+          // Gskc: copied over from PSLServiceHost_Serv.java: 25 Dec 2001
+          // AMIT MOD **
+          if (theSpecs.getTaskType().equals("HumanRealization"))
+            humanTasks.put(name, scheduler);
+          // **
+        }
+  
+      }; // ENDED: ServiceHost_Serv
+      if (psl.survivor.ProcessorMain.debug) System.out.println("Successfully created ServiceHost_Serv: " + this);
+
+    } catch (Throwable t) {
+    	t.printStackTrace();
+    }
+    // ENDED: Inherited from wfruntime.ServiceHost_Serv ///
+
+    
+    // the rmiService needs to have been setup by this point!
+    IServiceHost theHost = (IServiceHost) Naming.lookup("rmi://localhost:" + rmiPort + "/serviceHost");
+   
+    ConfigInfo theConfig = SpecParser.parseConfig(new File(wfRootDir, "workflows" + sc + wfName + sc + "config"));
+
     if (theRouting.getTaskType().equals("NonTransactionalTaskRealization") ||
       theRouting.getTaskType().equals("SynchronizationTaskIn") ||
       theRouting.getTaskType().equals("SynchronizationTaskOut")) {
@@ -251,7 +265,7 @@ System.out.println("4: GOT AS FAR AS HERE!!!, wfName: " + wfName + ", taskName: 
         }
       });
       
-log("PSL! inside resetTask: going to invoke theHost.putRealizationInClasspath(...): "); // 2-do: remove
+log("PSL! inside resetTask: going to invoke theHost.putRealizationInClasspath(...): theHost: " + theHost); // 2-do: remove
       for (int i=0; i<files.length; i++)
         theHost.putRealizationInClasspath(wfName,taskName,files[i], readClassFile(new File(subDir,files[i])));
     }
@@ -277,7 +291,7 @@ log("PSL! inside resetTask: going to invoke theHost.putRealizationInClasspath(..
           wfrealinfo.setStartHost(newLoader.getConfig().getHostForTask(wfrealinfo.getStartTask()));
         }
         */
-log("PSL! inside resetTask: going to beginScheduler(...): namePrefix: " + namePrefix); // 2-do: remove
+log("PSL! inside resetTask: going to beginScheduler(...): namePrefix: " + namePrefix + ", theHost: " + theHost); // 2-do: remove
         theHost.beginScheduler(taskName,theRouting,thePerms,creates,dTypes,exceptions,namePrefix,theConfig,fTypes,rinfo);
      }
     } catch (Throwable t) {

@@ -111,7 +111,7 @@ public class CloudNode implements Runnable {
     // add own capability into local 'knowledge-base' of network
     _peers.addElement(_capability);
 
-    System.out.println("WVMPORT:" + _wvm.getWVMPort());
+    if (psl.survivor.ProcessorMain.debug) System.out.println("WVMPORT:" + _wvm.getWVMPort());
     
     _wvm.requestHandler = new Runnable() {
       public void run() {

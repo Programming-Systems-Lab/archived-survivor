@@ -29,7 +29,7 @@ public class MessageHandler {
     }
     public void setCloudNode(CloudNode cn) { _cloudNode = cn; }
     public void handleMessage(Object o) {
-	System.out.println("&&&&&&&&& Received Message:\n"+o);
+	if (psl.survivor.ProcessorMain.debug) System.out.println("&&&&&&&&& Received Message:\n"+o);
 	if (o instanceof VTransportContainer) {
 	    VTransportContainer t = (VTransportContainer) o;
 	    if (t.isPingResponse()) {
@@ -44,7 +44,7 @@ public class MessageHandler {
 		    if (_pingRequests.contains(ti)) {
 			_pingRequests.remove(ti);
 		    } else {
-			System.err.println("does not contain ping response?");
+			if (psl.survivor.ProcessorMain.debug) System.err.println("does not contain ping response?");
 		    }
 		}
 	    } else if (t.isValidResponse()) {
@@ -59,8 +59,8 @@ public class MessageHandler {
 		    if (_validRequests.contains(ti)) {
 			_validRequests.remove(ti);
 		    } else {
-			System.err.println("does not contain valid response?");
-			System.err.println(ti);
+			if (psl.survivor.ProcessorMain.debug) System.err.println("does not contain valid response?");
+			if (psl.survivor.ProcessorMain.debug) System.err.println(ti);
 		    }
 		}
 	    } else if (t.isReplicatorPingResponse()) {
@@ -74,7 +74,7 @@ public class MessageHandler {
 		    if (_replicatorPingRequests.contains(t)) {
 			_replicatorPingRequests.remove(t);
 		    } else {
-			System.err.println("does not contain ping reponse?");
+			if (psl.survivor.ProcessorMain.debug) System.err.println("does not contain ping reponse?");
 		    }
 		}
 	    } else if (t.isReplicatorPing()) {
@@ -144,7 +144,7 @@ public class MessageHandler {
 	    Integer ti = new Integer(_pingIdentifier++);
 	    synchronized(_pingRequests) {
 		_pingRequests.add(ti);
-		System.err.println(ti);
+		if (psl.survivor.ProcessorMain.debug) System.err.println(ti);
 	    }
 	    t.setPing2(_pingIdentifier-1);
 	    sendMessage(t);
@@ -169,7 +169,7 @@ public class MessageHandler {
 		}
 	    }
 	} else {
-	    System.err.println("not a ping request but should be");
+	    if (psl.survivor.ProcessorMain.debug) System.err.println("not a ping request but should be");
 	}
 	return false;
     }
@@ -178,7 +178,7 @@ public class MessageHandler {
 	    Integer ti = new Integer(_validIdentifier++);
 	    synchronized(_validRequests) {
 		_validRequests.add(ti);
-		System.err.println(ti);
+		if (psl.survivor.ProcessorMain.debug) System.err.println(ti);
 	    }
 	    t.setValid(_validIdentifier-1);
 	    sendMessage(t);  
@@ -203,7 +203,7 @@ public class MessageHandler {
 		}
 	    }
 	} else {
-	    System.err.println("not a \"valid\" request but should be");
+	    if (psl.survivor.ProcessorMain.debug) System.err.println("not a \"valid\" request but should be");
 	}
 	return false;
     }
@@ -224,7 +224,7 @@ public class MessageHandler {
 		now = new Date();
 	    }
 	} else {
-	    System.err.println("not a replicatorping request but should be");
+	    if (psl.survivor.ProcessorMain.debug) System.err.println("not a replicatorping request but should be");
 	}
 	synchronized(_replicatorPingRequests) {
 	    if (_replicatorPingRequests.contains(t)) {
@@ -234,7 +234,7 @@ public class MessageHandler {
 	return false;
     }
     public void sendMessage(VTransportContainer t) {
-	System.out.println("&&&&&&&&&&&&&&&& Sending Message:\n " + t);
+	if (psl.survivor.ProcessorMain.debug) System.out.println("&&&&&&&&&&&&&&&& Sending Message:\n " + t);
 	t.setSource(_processor.getName(),
 		    _processor.getHostName(),
 		    _processor.getPort());

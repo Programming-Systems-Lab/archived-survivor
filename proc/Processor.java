@@ -94,14 +94,14 @@ public class Processor implements Runnable {
 	    for (int i = 0; i < al.size(); i++) {
 		TaskProcessorHandle t = (TaskProcessorHandle) al.get(i);
 		if (t==null)  {
-		    System.out.println("t == null");
+		    if (psl.survivor.ProcessorMain.debug) System.out.println("t == null");
 		} else {
-		    System.out.println("t.sendNewHandle");
+		    if (psl.survivor.ProcessorMain.debug) System.out.println("t.sendNewHandle");
 		    t.sendNewHandle(tph, this);
 		}
 	    }
 	    addProcessor(tph);
-	    System.out.println("tph.sendPool");
+	    if (psl.survivor.ProcessorMain.debug) System.out.println("tph.sendPool");
 	    tph.sendPool(al, this);
 	}
     }
@@ -119,7 +119,7 @@ public class Processor implements Runnable {
 	// versioning happens here
 	// TODO remove nonsense hereunder
 	if (nextTask == null) {
-	    System.out.println("%%%%%%%%%%%%%%BAD");
+	    if (psl.survivor.ProcessorMain.debug) System.out.println("%%%%%%%%%%%%%%BAD");
 	}
 	nextTask.append(taskName);
 
@@ -157,8 +157,9 @@ public class Processor implements Runnable {
 	return null;
     }
 
-    protected void executeRemoteTask(final Version theTask) {      System.out.println("PSL! entered executeRemoteTask: theTask.data(): " + theTask.data().getClass().getName());
-      System.out.println("PSL! entered executeRemoteTask: theTask.data2(): " + theTask.data2().getClass().getName());
+    protected void executeRemoteTask(final Version theTask) {
+    	if (psl.survivor.ProcessorMain.debug) System.out.println("PSL! entered executeRemoteTask: theTask.data(): " + theTask.data().getClass().getName());
+      	if (psl.survivor.ProcessorMain.debug) System.out.println("PSL! entered executeRemoteTask: theTask.data2(): " + theTask.data2().getClass().getName());
 	TaskDefinition td = (TaskDefinition) theTask.data();
 	ArrayList al = _poolData.getValidProcessors(td);
 	log("number of valid processors:" + al.size());
@@ -166,9 +167,9 @@ public class Processor implements Runnable {
 	    td);
 	for (int i = 0; i < al.size(); i++) {
 	    TaskProcessorHandle tph = (TaskProcessorHandle) al.get(i);
-	    System.out.print("IS VALID?");
+	    if (psl.survivor.ProcessorMain.debug) System.out.print("IS VALID?");
 	    if (tph.valid(this)) {
-		System.out.println(" YES");
+		if (psl.survivor.ProcessorMain.debug) System.out.println(" YES");
 		final TaskProcessorHandle tph2 = tph;
 		final Processor p = this;
 		Thread t = new Thread() {
@@ -180,7 +181,7 @@ public class Processor implements Runnable {
 		t.start();
 		return;
 	    } else {
-		System.out.println(" NO");
+		if (psl.survivor.ProcessorMain.debug) System.out.println(" NO");
 		_poolData.testValidity(tph);
 	    }
 	}
@@ -263,10 +264,10 @@ public class Processor implements Runnable {
     public boolean valid() { return true; }
 
     protected void log(String s) {
-	System.err.println(s);
+	if (psl.survivor.ProcessorMain.debug) System.err.println(s);
     }
     protected void log(int i) {
-	System.err.println(i);
+	if (psl.survivor.ProcessorMain.debug) System.err.println(i);
     }
 
     public void run() {

@@ -23,6 +23,7 @@ import psl.survivor.xml.ProcessorBuilder;
 import psl.survivor.proc.*;
 
 public class ProcessorMain {
+    public static boolean debug = false;
     public static void main(String[] args) {
 	ProcessorBuilder pm = null;
 	
@@ -57,10 +58,16 @@ public class ProcessorMain {
                 // TCP listener port
 		lPort = Integer.parseInt(args[i+1]);
 	    }
+
+	    if (args[i].equals("-d")) {
+	    	// DEBUG mode
+		debug = true;
+	    }
 	}
 	
 	if (xmlPath == null) { 
-	    System.out.println("WRONG ARGUMENTS");
+	    System.out.println("usage: java ProcessorMain -f <.xml> -n <rName> -h <rHost> -p <rPort> -l <port> -d <dbg>");
+	    return;
 	}
 	
 	pm = new ProcessorBuilder(xmlPath);
@@ -105,15 +112,20 @@ public class ProcessorMain {
 		    if (command.startsWith(CMD_SHUTDOWN)) {
 			System.out.println("Received a shutdown request");
 			System.exit(0);
+		    /*
 		    } else if (command.startsWith(CMD_STARTWF)) {
 			System.out.println("Received a start request");
 			proc.startWorkflow(command.substring(CMD_STARTWF.length()));
+		    */
 		    } else if (command.startsWith(CMD_CLOUD)) {
 			System.out.println("Received a cloud status request");
 			PoolData pd = proc.getPoolData();
 			System.out.println(pd.toString());
 		    } else if (command.startsWith(CMD_QUIT)) {
 			break;
+		    } else if (command.startsWith("s")) {
+			if (psl.survivor.ProcessorMain.debug) System.out.println("TEMPORARY SHORTCUT!!! Received a start request");
+			proc.startWorkflow("svr1-1");
 		    }
 		    System.out.println("received command: " + command);
 		

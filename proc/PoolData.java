@@ -19,7 +19,7 @@ public class PoolData {
 	    for (int i = 0; i < _processorHandles.size(); i++) {
 		if (((TaskProcessorHandle)_processorHandles.get(i)).getName().equals(tph.getName())) return;
 	    }
-	    System.out.println("ADDING a TPH*******************************"); 
+	    if (psl.survivor.ProcessorMain.debug) System.out.println("ADDING a TPH*******************************"); 
 	    _processorHandles.add(tph);
 	}
     }
@@ -34,7 +34,7 @@ public class PoolData {
 	    for (int i = 0; i < _processorHandles.size(); i++) {	
 		TaskProcessorHandle tph = (TaskProcessorHandle) 
 		    _processorHandles.get(i);
-		System.out.println("checking out taskHandle:" + tph);
+		if (psl.survivor.ProcessorMain.debug) System.out.println("checking out taskHandle:" + tph);
 		if (tph.match(td)) {
 		    returnValue.add(tph);
 		}
