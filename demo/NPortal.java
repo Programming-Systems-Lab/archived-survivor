@@ -46,6 +46,7 @@ import java.awt.Color;
 import java.awt.Component;
 
 import java.util.Map;
+import java.util.Date;
 import java.util.TreeMap;
 
 import javax.swing.JList;
@@ -105,8 +106,19 @@ public final class NPortal {
                                          initTaskPanel(), 
                                          initReplPanel()) {
                                          
+                      int lastLoc;
+                      long lastSet = new Date().getTime();
+                      long currTime;
                       public void paint(Graphics g) {
-                        setDividerLocation(0.5);
+                        currTime = new Date().getTime();
+                        if (Math.abs(getDividerLocation() - lastLoc) >= 0.05) { 
+                          setDividerLocation(0.5);
+                          lastLoc = getDividerLocation();
+                          lastSet = currTime;
+                        } else if (currTime - lastSet >= 200) {
+                          setDividerLocation(0.5);
+                          lastSet = currTime;
+                        }
                         super.paint(g);
                       }
                     }, 
