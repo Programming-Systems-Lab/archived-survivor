@@ -1,5 +1,4 @@
 TODO:
-- what to do when receive multiple requests to kill a certain task?
 - shutdown on Processor should do some cleanup:
         + inform peers that it is going down
         + maybe if some task is still running, refuse to shutdown, etc
@@ -7,14 +6,6 @@ TODO:
   hasn't completed ... ie. is an 'endangered task'
 - need to fix the versioning to have a pre-execution, mid-execution and
   post-execution version
-- WVM should be created before the ServiceHost_Serv ++ NRLProcessor
-  coz it needs the rmiregistry ... or in the very least, the
-  ServiceHost_Serv should be created *after* the WVM .... might wanna
-  make this a singleton ServiceHost_Serv, btw
-- need to either change the RMI name for the ServiceHost_Serv to 
-  <taskName>-serviceHost, or not use RMI at all here
-- create a different ServiceHost_Serv/Scheduler_Serv for every invocation 
-   of executeTaskLocal in NRLProcessor
 - fix problem when a remoteTaskProcessor is really local (make it be a local
   call instead of using worklets)
 - global logging + standardize error messages
@@ -40,4 +31,18 @@ DONE:
 *- stop task ... done, I think ...  shutdown cloud ... done, but need
   cleanup
 *- fix XML schema to be more reflective of the XML we are actually using
+*- WVM should be created before the ServiceHost_Serv ++ NRLProcessor
+  coz it needs the rmiregistry ... or in the very least, the
+  ServiceHost_Serv should be created *after* the WVM .... might wanna
+  make this a singleton ServiceHost_Serv, btw
+*- need to either change the RMI name for the ServiceHost_Serv to 
+  <taskName>-serviceHost, or not use RMI at all here
+*- create a different ServiceHost_Serv/Scheduler_Serv for every invocation 
+   of executeTaskLocal in NRLProcessor. Actually, there is only a single
+   instance of these objects, but they've been modified to support multiple
+   task processing
+*- what to do when receive multiple requests to kill a certain task? well,
+  just add all requests to the _stoppedTasks Set so that can ignore the result
+  data of this task
+
 
