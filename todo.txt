@@ -22,8 +22,8 @@ TODO:
 - fix service discovery aspect so that we don't learn about each service more than once (as happens now). It's a small bug that doesn't affect the "working" nature of the final product, but it's still a bug.
 
 DONE:
-*- JD: get Replicators working by default in the ProcessorMain, fix STOP-TASK
-  Gskc: use reflection to obtain processor-TYPE
+*- get Replicators working by default in the ProcessorMain, fix STOP-TASK,
+  use reflection to obtain processor-TYPE
 *- fix the replication of data (such as name, port and hostname) all
   over the place.
 *- differentiate between valid and ping (right now, they are treated
