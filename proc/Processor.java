@@ -24,7 +24,7 @@ public class Processor implements Runnable {
     /**
      * CTOR
      */
-    public Processor(String name, int wvmPort, int tcpPort, String rmiName, 
+    public Processor(String name, int tcpPort, String rmiName, 
 		     String wfDefPath) {
 	_versionCache = new VersionCache();
 	_taskQueue = new Vector();

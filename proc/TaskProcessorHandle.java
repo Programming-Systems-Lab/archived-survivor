@@ -8,28 +8,18 @@ import psl.survivor.util.*;
 public class TaskProcessorHandle {
     
     private String _name;
+    private String _hostname;
+    private int _port;
     private ArrayList _capabilities;
 
     /**
      * CTOR
      */
-    public TaskProcessorHandle(String name) {
-	_capabilities = new ArrayList();
-	_name = name;
-    }
-
-    public String getName() {
-	return _name;
-    }
-
-    public void addCapabilities(Object o) {
-	if (!_capabilities.contains(o)) {
-	    _capabilities.add(o);
-	}
-    }
-
-    public ArrayList getCapabilities() {
-	return _capabilities;
+    public TaskProcessorHandle(TPTransportContainer tptc) {
+	_name = tptc.getName();
+	_hostname = tptc.getHostName();
+	_port = tptc.getPort();
+	_capabilities = tptc.getCapabilities;
     }
 
     public boolean valid() {
@@ -70,4 +60,10 @@ public class TaskProcessorHandle {
 	}
 	return true;
     }
+    public String getName() { return _name; }
+    public String getHostName() { return _hostname; }
+    public int getPort() { return _port; }
+    public ArrayList getCapabilities() { return _capabilities; }
+    public int getSize() { return _capabilities.size(); }
+    public Object getCapability(int i) { return _capabilities.get(i); }
 }

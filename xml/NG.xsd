@@ -15,7 +15,7 @@
 				</xs:element>
 			</xs:sequence>
 			<xs:attribute name="name" type="xs:string" use="required"/>
-			<xs:attribute name="WVMPort" type="xs:int" use="required"/>
+			<xs:attribute name="RMIName" type="xs:string" use="required"/>
 			<xs:attribute name="TCPPort" type="xs:int" use="required"/>
 			<xs:attribute name="WorkflowDefinitionPath" type="xs:string" use="optional"/>
 		</xs:complexType>

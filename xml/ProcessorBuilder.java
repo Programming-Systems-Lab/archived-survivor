@@ -14,16 +14,14 @@ import psl.survivor.proc.*;
 import psl.survivor.net.*;
 
 public class ProcessorBuilder {
-    private SAXParser sxp = null;
+    private SAXParser _sxp = null;
     private ArrayList _processors = null;
 
     public ProcessorBuilder(String xmlPath) {
-	System.out.println("xmlPath: " + xmlPath);
-	
-	sxp = new SAXParser();
-	sxp.setContentHandler(new ProcessorHandler(this));
+	_sxp = new SAXParser();
+	_sxp.setContentHandler(new ProcessorHandler(this));
 	try {
-	    sxp.parse(new InputSource
+	    _sxp.parse(new InputSource
 		(new FileInputStream(xmlPath)));
 	} catch (Exception e) {
 	    e.printStackTrace();
@@ -37,10 +35,9 @@ public class ProcessorBuilder {
 
     public void createCloudNode(String peer) {
 	Processor p = ((Processor)_processors.get(0)); // 1 processor only
-	CloudNode cn = new CloudNode(peer, new TPTransportContainer
-	    (null, null, 0), new MessageHandler());
-	// peer = rmi@hostname:port
-
+	
+	CloudNode cn = new CloudNode(peer, new TPTransportContainer(p), 
+				     new MessageHandler());
     }
 
     public void log(String s) {
@@ -56,8 +53,8 @@ public class ProcessorBuilder {
 	private int _depth;
 
 	private String _processorName = "default";
-	private int _wvmPort = 8882;
 	private int _tcpPort = 8883;
+	private String _rmiName = "";
 	private String _wfDefPath = "";
 	private ArrayList _capabilities = new ArrayList();
 	private ArrayList _processors = new ArrayList();
@@ -76,10 +73,10 @@ public class ProcessorBuilder {
 		    String s;
 		    s = attributes.getValue("", "name");
 		    if (s != null) _processorName = s;
-		    s = attributes.getValue("", "WVMPort");
-		    if (s != null) _wvmPort = Integer.parseInt(s);
 		    s = attributes.getValue("", "TCPPort");
 		    if (s != null) _tcpPort = Integer.parseInt(s);
+		    s = attributes.getValue("", "RMIName");
+		    if (s != null) _rmiName = s;
 		    s = attributes.getValue
 			("", "WorkflowDefinitionPath");
 		    if (s != null) _wfDefPath = s;
@@ -109,7 +106,7 @@ public class ProcessorBuilder {
 	    if (localName.equals("TaskProcessor")) {
 		if (_depth == 0) {
 		    Processor p = new Processor
-			(_processorName, _wvmPort, _tcpPort, null,
+			(_processorName, _tcpPort, _rmiName,
 			 _wfDefPath);
 		    for (int i = 0; i < _capabilities.size(); i++) {
 			p.addCapability(_capabilities.get(i));
@@ -117,8 +114,8 @@ public class ProcessorBuilder {
 		    _processors.add(p);
 		    _capabilities.clear();
 		    _processorName = "default";
-		    _wvmPort = 8882;
 		    _tcpPort = 8883;
+		    _rmiName = "";
 		    _wfDefPath = "";		    
 		} else {
 		    _pm.log("bad");
