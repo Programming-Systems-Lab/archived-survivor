@@ -45,7 +45,8 @@ import java.awt.Font;
 import java.awt.Color;
 import java.awt.Component;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.JList;
 import javax.swing.JFrame;
@@ -90,9 +91,9 @@ public final class NPortal {
     _frame.setSize(_width, _height);
     _frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-    _procPanel = new JPanel();
-    _taskPanel = new JPanel();
-    _replPanel = new JPanel();
+    _procScrollPane = new JScrollPane(_procPanel = new JPanel());
+    _taskScrollPane = new JScrollPane(_taskPanel = new JPanel());
+    _replScrollPane = new JScrollPane(_replPanel = new JPanel());
     
     // add the processor-info display panel
     _pane.addTab("Processor", null, initProcPanel(), 
@@ -102,7 +103,13 @@ public final class NPortal {
     _pane.addTab("Tasks and Replications", null, 
                  _sPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
                                          initTaskPanel(), 
-                                         initReplPanel()), 
+                                         initReplPanel()) {
+                                         
+                      public void paint(Graphics g) {
+                        setDividerLocation(0.5);
+                        super.paint(g);
+                      }
+                    }, 
                  "Information on executing tasks");
     
     if (ProcessorMain.debug) testing();
@@ -114,8 +121,8 @@ public final class NPortal {
    * 
    */
   final JPanel _procPanel;
+  final JScrollPane _procScrollPane;
   private JScrollPane initProcPanel() {
-    JScrollPane scrollPane = new JScrollPane(_procPanel);
     JTable table = new JTable(
       // replace the following line with the capability list from Processor
       // split up into key-value pairs
@@ -130,11 +137,12 @@ public final class NPortal {
     _procPanel.add(new JLabel("Processor capabilities"), BorderLayout.NORTH);
     _procPanel.add(table, BorderLayout.CENTER);
     
-    return (scrollPane);
+    return (_procScrollPane);
   }
 
   // TASK-INFO DISPLAY //////////////////////////////////////////////
   final JPanel _taskPanel;
+  final JScrollPane _taskScrollPane;
   final DefaultListModel _taskListModel = new DefaultListModel();
   final JList _taskList = new JList(_taskListModel);
   
@@ -143,9 +151,6 @@ public final class NPortal {
    * 
    */
   private JScrollPane initTaskPanel() {
-    JScrollPane scrollPane = new JScrollPane(_taskPanel);
-    // replace the following line with the capability list from Processor
-    // split up into key-value pairs
     _taskList.setCellRenderer(new ListCellRenderer() {
       public Component getListCellRendererComponent(JList list, 
           Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -189,11 +194,12 @@ public final class NPortal {
     _taskPanel.add(new JLabel("Task information"), BorderLayout.NORTH);
     _taskPanel.add(_taskList, BorderLayout.CENTER);
     
-    return (scrollPane);
+    return (_taskScrollPane);
   }
   
   // REPLICATING-INFO DISPLAY ///////////////////////////////////////
   final JPanel _replPanel;
+  final JScrollPane _replScrollPane;
   final DefaultListModel _replListModel = new DefaultListModel();
   final JList _replList = new JList(_replListModel);
   
@@ -201,7 +207,6 @@ public final class NPortal {
    * initialise the replicating-info display panel
    */
   private JScrollPane initReplPanel() {
-    JScrollPane scrollPane = new JScrollPane(_replPanel);
     _replList.setCellRenderer(new ListCellRenderer() {
       public Component getListCellRendererComponent(JList list, 
           Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -230,7 +235,7 @@ public final class NPortal {
             l.setText("replicating");
           } else if (di.isReplExited()) {
             p.setBackground(Color.black);
-            l.setText("replication complete");
+            l.setText("completed");
           } else if (di.isReplProcDown()) {
             p.setBackground(Color.red);
             l.setText("processor down");
@@ -248,7 +253,7 @@ public final class NPortal {
     _replPanel.add(new JLabel("Replication information"), BorderLayout.NORTH);
     _replPanel.add(_replList, BorderLayout.CENTER);
     
-    return (scrollPane);
+    return (_replScrollPane);
   }
   
   ///////////////////////////////////////////////////////////////////
@@ -263,7 +268,7 @@ public final class NPortal {
     final String _taskName;
     final String _procName;
     int _status;
-    private static final Hashtable _hashtable = new Hashtable();
+    private static final Map _map = new TreeMap();
     
     /** executing task */
     private static final int ACTIVE = 0;
@@ -299,15 +304,13 @@ public final class NPortal {
       return _taskName + ":" + _procName + ":" + _status;
     }
     
-    static DisplayItem createInstance(String taskName, String procName) {
-    String key = taskName+procName;
-      if (_hashtable.containsKey(key)) return null;
-      _hashtable.put(key, new DisplayItem(taskName, procName));
-      return instance(taskName, procName);
+    static DisplayItem createInstance(Version key, String taskName, String procName) {
+      if (_map.containsKey(key)) return null;
+      _map.put(key, new DisplayItem(taskName, procName));
+      return instance(key);
     }
-    static DisplayItem instance(String taskName, String procName) {
-    String key = taskName+procName;
-      return (DisplayItem) _hashtable.get(key);
+    static DisplayItem instance(Version key) {
+      return (DisplayItem) _map.get(key);
     }
     
     void exited() { if (isActive() || isToKill()) _status = EXITED; }
@@ -360,33 +363,27 @@ public final class NPortal {
      * processor was asked to execute a task
      */
     public void executeTaskLocal(Version v) {
-      DisplayItem di = DisplayItem.createInstance(taskName(v), "");
+      DisplayItem di = DisplayItem.createInstance(v, taskName(v), "");
       if (di == null) return;
       _taskListModel.addElement(di);
-      _taskList.invalidate();
-      _frame.invalidate();
     }
     
     /**
      * processor completed executing the task
      */
     public void completedTaskLocal(Version v) {
-      DisplayItem di = DisplayItem.instance(taskName(v), "");
+      DisplayItem di = DisplayItem.instance(v);
       if (di == null) return;
       di.exited();
-      _taskList.invalidate();
-      _frame.invalidate();
     }
     
     /**
      * processor was asked to stop a running task
      */
     public void stopTaskLocal(Version v) {
-      DisplayItem di = DisplayItem.instance(taskName(v), "");
+      DisplayItem di = DisplayItem.instance(v);
       if (di == null) return;
       di.toKill();
-      _taskList.invalidate();
-      _frame.invalidate();
     }
     
     /**
@@ -394,24 +391,20 @@ public final class NPortal {
      * already been asked to stop the task
      */
     public void ignoreResultsOfStoppedTask(Version v) {
-      DisplayItem di = DisplayItem.instance(taskName(v), "");
+      DisplayItem di = DisplayItem.instance(v);
       if (di == null) return;
       di.killed();
-      _taskList.invalidate();
-      _frame.invalidate();
     }
     
     /**
      * replicator was asked to monitor task execution by
      * a remote processor
      */
-    public void replicatingTask(Version v) {
-      DisplayItem di = DisplayItem.createInstance(taskName(v), procName(v));
+    public void replicatingTask(Version v, Version finalVer) {
+      DisplayItem di = DisplayItem.createInstance(v, taskName(finalVer), procName(v));
       if (di == null) return;
       di.replActive();
       _replListModel.addElement(di);
-      _replList.invalidate();
-      _frame.invalidate();
     }
     
     /**
@@ -419,11 +412,8 @@ public final class NPortal {
      * any more since remote processor completed the task
      */
     public void doneReplicatingTask(Version v) {
-      DisplayItem di = DisplayItem.instance(taskName(v), procName(v));
-      if (di == null) return;
+      DisplayItem di = DisplayItem.instance(v);
       di.replExited();
-      _replList.invalidate();
-      _frame.invalidate();
     }
     
     /**
@@ -431,11 +421,9 @@ public final class NPortal {
      * longer responding
      */
     public void processorDown(Version v) {
-      DisplayItem di = DisplayItem.instance(taskName(v), procName(v));
+      DisplayItem di = DisplayItem.instance(v);
       if (di == null) return;
       di.replProcDown();
-      _replList.invalidate();
-      _frame.invalidate();
     }
     
     /**
@@ -444,18 +432,15 @@ public final class NPortal {
      * of time
      */
     public void taskTimeOut(Version v) {
-      DisplayItem di = DisplayItem.instance(taskName(v), procName(v));
+      DisplayItem di = DisplayItem.instance(v);
       if (di == null) return;
       di.replTimedOut();
-      _replList.invalidate();
-      _frame.invalidate();
     }  
 
     // processor capabilities
     public void addedCapability(Object o) {
       // find out the type of o, and use it somehow to update the
       // JTable in _procPanel
-      System.out.println("added a capability: " + o);
     }
   }
   
@@ -486,7 +471,7 @@ public final class NPortal {
     panel.add(b = new JButton("replicatingTask"));
     b.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ae) {
-        global_TASKNAME = task.getText(); global_PROCNAME = proc.getText(); loggerInstance.replicatingTask(null);
+        global_TASKNAME = task.getText(); global_PROCNAME = proc.getText(); loggerInstance.replicatingTask(null, null);
       }
     });
 

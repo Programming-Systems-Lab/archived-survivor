@@ -1,4 +1,5 @@
 package psl.survivor.proc;
+
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Iterator;
@@ -87,7 +88,7 @@ public class Replicator implements Runnable {
 	on a processor */
     public void alertExecutingTask(Version v) {
 	_tasksInProgress.put(v, new Date());
-	_log.replicatingTask(v);
+	_log.replicatingTask(v, _versionCache.getLatestVersion(v));
     }
 
 
@@ -96,7 +97,8 @@ public class Replicator implements Runnable {
     public void alertDoneExecutingTask(Version v) {
 	synchronized (_tasksInProgress) {
 	    if (_tasksInProgress.containsKey(v)) {
-		_log.doneReplicatingTask(v);
+		// _log.doneReplicatingTask(v);
+		_log.doneReplicatingTask(_versionCache.getLatestVersion(v));
 		_tasksInProgress.remove(v);
 	    } else {
 		;

@@ -27,7 +27,7 @@ public interface Log {
      * TaskProcessorHandle = v.data();
      * You can get the task processor's name from that.
      */
-    public void replicatingTask(Version v);
+    public void replicatingTask(Version v, Version finalVer);
     public void doneReplicatingTask(Version v);
     public void processorDown(Version v);
     public void taskTimeOut(Version v);
