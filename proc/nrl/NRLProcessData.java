@@ -12,8 +12,8 @@ import java.io.Serializable;
  */
 public class NRLProcessData implements Serializable {
   
-    /** The parameter that gets passed */
-    public HashMap param = null;
+  /** The parameter that gets passed */
+  public HashMap param = null;
 
   /** workflow identifier */
   public String workflowName = null;

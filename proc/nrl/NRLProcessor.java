@@ -61,7 +61,7 @@ public class NRLProcessor extends Processor {
 
   // BEGIN: Inherited from psl.survivor.proc.Processor /////////////////////////
 
-    private static HashMap _latestParam;
+  private static HashMap _latestParam;
 
   /** Initialise and setup processor */
   public NRLProcessor(String name, int tcpPort, String rmiName, 
@@ -92,6 +92,7 @@ public class NRLProcessor extends Processor {
 
     // TODO Modify nrl's code to not use RMI, and get rid of this
     
+    _latestParam = new HashMap(); // TODO threads will cause problems here
     _latestParam.putAll(processData.param);
 
     final Object instanceId = processData.instanceId;
@@ -176,6 +177,7 @@ public class NRLProcessor extends Processor {
     NRLProcessData npd = new NRLProcessData();    
     npd.workflowName = wfName;
     npd.instanceId = new Integer(_iKey);
+    npd.param = new HashMap();
 
     // TODO should that be "start"
     npd.originTask = "START";
@@ -238,6 +240,7 @@ public class NRLProcessor extends Processor {
                 Hashtable paramTable = outBindings;
                 String originTask = this.name; // this task is the next 'originTask'
                 NRLProcessData resultData = new NRLProcessData();    
+                resultData.param = new HashMap();
                 resultData.workflowName = wfName;          
                 resultData.instanceId = instanceId;           
                 resultData.originTask = originTask;        
@@ -254,7 +257,7 @@ public class NRLProcessor extends Processor {
                 NRLProcessData resultData = new NRLProcessData();    
                 resultData.workflowName = "END";
 
-		_resultDataStorage.put(instanceId.toString(), resultData);
+                _resultDataStorage.put(instanceId.toString(), resultData);
               }
             }   
           }; // ENDED: Scheduler_Serv
