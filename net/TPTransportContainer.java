@@ -24,6 +24,7 @@ public class TPTransportContainer implements Serializable {
 
 
     /** Create a TC for a Processor and its capabilities.
+     */
     public TPTransportContainer(Processor p) {
 	_name = p.getName();
 	_hostname = p.getHostName();

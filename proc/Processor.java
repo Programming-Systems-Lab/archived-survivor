@@ -23,6 +23,9 @@ import psl.survivor.util.*;
  */
 public abstract class Processor implements Runnable {
 
+    /** Processor Log */
+    protected psl.survivor.proc.Log _log;
+
     /** Name of processor */
     protected String _processorName;
 
@@ -77,7 +80,8 @@ public abstract class Processor implements Runnable {
      * CTOR
      */
     public Processor(String name, int tcpPort, String rmiName, 
-		     String wfDefPath) {
+		     String wfDefPath, Log l) {
+	_log = l;
 	_stoppedTasks = new HashSet();
 	_versionCache = new VersionCache();
 	_taskQueue = new Vector();
@@ -107,6 +111,7 @@ public abstract class Processor implements Runnable {
     public String getWfDefPath() { return _wfDefPath; }
     public String getRmiName() { return _rmiName; }
     public String getHostName() { return _hostname; }
+    public Log getLog() { return _log; }
 
     /** Returns a handle to this Task Processor. This handle may be used 
      * Remotely to communicate with this Processor */
@@ -238,7 +243,7 @@ public abstract class Processor implements Runnable {
 	if (_stoppedTasks.contains(theTask)) {
 	    // this task was supposed to be stopped .. can ignore result
 	    _stoppedTasks.remove(theTask);
-
+	    _log.ignoreResultsOfStoppedTask(theTask);
 	} else if (nextTask == null) { 
 	    // this only happens if we have reached
 	    // the end of the workflow execution 
@@ -270,6 +275,7 @@ public abstract class Processor implements Runnable {
 	// So currently, we let the task execute, but when it ends, we do
 	// not pass its results to anyone.
 	_stoppedTasks.add(v);
+	_log.stopTaskLocal(v);
     }
 
     /** Tell the replicators that we are about to execute a Task. */
@@ -306,7 +312,7 @@ public abstract class Processor implements Runnable {
 	TaskDefinition td = (TaskDefinition) theTask.data();
 
 	// First we need to find a processor that can handle the task 
-	ArrayList al = _poolData.getValidProcessors(td);Q
+	ArrayList al = _poolData.getValidProcessors(td);
 	log("number of valid processors:" + al.size());
 	log("TaskDefinition of what we are looking for:" + 
 	    td);

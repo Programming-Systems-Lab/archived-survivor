@@ -1,0 +1,33 @@
+package psl.survivor.proc;
+
+import psl.survivor.util.*;
+
+/**
+ * General logging interface for important events that happen w/in
+ * Processors and Replicators.
+ *
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu)
+ * @author Gaurav S. Kc (gskc@cs.columbia.edu) 
+ */
+
+public interface Log {
+
+    // task execution
+    /*
+     * NRLProcessData = v.data2();
+     * You can get the taskname from that
+     */
+    public void executeTaskLocal(Version v);
+    public void stopTaskLocal(Version v);
+    public void ignoreResultsOfStoppedTask(Version v);
+
+    // task replication
+    /*
+     * TaskProcessorHandle = v.data();
+     * You can get the task processor's name from that.
+     */
+    public void replicatingTask(Version v);
+    public void doneReplicatingTask(Version v);
+    public void processorDown(Version v);
+    public void taskTimeOut(Version v);
+}

@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Transport container for Replicator messages.
  *
- * Currently not used. VTransport Container used for all communications */
+ * Currently not used. VTransport Container used for all communications 
  *
  * @author Gaurav S. Kc (gskc@cs.columbia.edu)
  * @author Jean-Denis Greze (jg253@cs.columbiae.edu)

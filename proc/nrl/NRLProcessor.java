@@ -61,8 +61,8 @@ public class NRLProcessor extends Processor {
 
   /** Initialise and setup processor */
   public NRLProcessor(String name, int tcpPort, String rmiName, 
-                      String wfDefPath) {
-    super(name, tcpPort, rmiName, wfDefPath);
+                      String wfDefPath, Log l) {
+    super(name, tcpPort, rmiName, wfDefPath, l);
     if (psl.survivor.ProcessorMain.debug) System.out.println("NRLProcessor: " + name + ":" + tcpPort + "/" + rmiName);
 
     wfRootDir = this.wfDefPath = wfDefPath;
@@ -79,6 +79,8 @@ public class NRLProcessor extends Processor {
    */
   protected Version executeTaskLocal(Version theTask) {
     if (psl.survivor.ProcessorMain.debug) System.out.println("CORRECT\n\n\n");
+
+    _log.executeTaskLocal(theTask);
 
     // TODO need to fix the instanceId to be unique per task, not workflow
     final NRLProcessData processData = (NRLProcessData) theTask.data2();

@@ -106,6 +106,7 @@ public class ProcessorBuilder {
     private String _wfDefPath = "";
     private ArrayList _capabilities = new ArrayList();
     private ArrayList _processors = new ArrayList();
+      private Log _log = psl.survivor.ProcessorMain.THELOG;
 
     /** CTOR */
     public ProcessorHandler(ProcessorBuilder pm) {
@@ -158,8 +159,8 @@ public class ProcessorBuilder {
       if (localName.equals("TaskProcessor")) {
         if (_depth == 0) {
 
-          final Class [] parameterTypes = new Class[] { String.class, int.class, String.class, String.class };
-          final Object [] parameterVals = new Object[] { _processorName, new Integer(_tcpPort), _rmiName, _wfDefPath };
+          final Class [] parameterTypes = new Class[] { String.class, int.class, String.class, String.class , psl.survivor.proc.Log.class};
+          final Object [] parameterVals = new Object[] { _processorName, new Integer(_tcpPort), _rmiName, _wfDefPath, _log };
           Class procClass = null;
           Constructor constr = null;
           Processor p = null;

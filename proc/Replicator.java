@@ -47,6 +47,7 @@ public class Replicator implements Runnable {
     /** The local processor to this Replicator */
     private Processor _processor; 
     
+    private psl.survivor.proc.Log _log;
 
     /** CTOR */
     public Replicator(String name, Processor p) {
@@ -55,6 +56,7 @@ public class Replicator implements Runnable {
 	_poolData = p.getPoolData();
 	_tasksInProgress = new TreeMap();
 	_versionLookup = new TreeMap();
+	_log = p.getLog();
     }
 
 
@@ -85,6 +87,7 @@ public class Replicator implements Runnable {
 	on a processor */
     public void alertExecutingTask(Version v) {
 	_tasksInProgress.put(v, new Date());
+	_log.replicatingTask(v);
     }
 
 
@@ -93,6 +96,7 @@ public class Replicator implements Runnable {
     public void alertDoneExecutingTask(Version v) {
 	synchronized (_tasksInProgress) {
 	    if (_tasksInProgress.containsKey(v)) {
+		_log.doneReplicatingTask(v);
 		_tasksInProgress.remove(v);
 	    } else {
 		;
@@ -234,7 +238,7 @@ public class Replicator implements Runnable {
 
     /** Check all tasks that we are supposed to be monitoring. If the
         processors are down, of it the tasks have timed out, we
-        mediate a survivor. */`
+        mediate a survivor. */
     public void run() {
 	while (true) {
 	    synchronized (_tasksInProgress) {
@@ -250,6 +254,7 @@ public class Replicator implements Runnable {
 
 			// if processor is down, let's survive
 			if (!tph.ping(v.split(null), _processor)) {
+			    _log.processorDown(v);
 			    final Version v1 = v;
 			    Thread t = new Thread() {
 				    public void run() {
@@ -263,6 +268,7 @@ public class Replicator implements Runnable {
 
 			// if the task has timed out, let's survive
 			if ((now.getTime() - _TIME_TO_PROCESS) > d.getTime()) {
+			    _log.taskTimeOut(v);
 			    final Version v1 = v;
 			    Thread t = new Thread() {
 				    public void run() {

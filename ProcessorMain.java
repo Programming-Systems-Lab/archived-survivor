@@ -32,6 +32,9 @@ public class ProcessorMain {
 
     public static boolean debug = false;
 
+    // GSKC THIS IS FOR YOU
+    public static psl.survivor.proc.Log THELOG = null;
+
     /**
      * MAIN
      *
