@@ -42,6 +42,9 @@ class CloudNode implements Runnable {
   private Thread _pingThread = null;
   */
 
+  /** MessageHandler for local host */
+  private final MessageHandler _msgHandler;
+
   /** listing of peer CloudNodes in the network / vicinity */
   private final Vector _peers;
 
@@ -59,15 +62,29 @@ class CloudNode implements Runnable {
   
   private static final String REPLICATE_REQ = "PLEASE REPLICATE MY DATA";
   private static final String RETRIEVE_REQ = "PLEASE REPLICATE MY DATA";
+
+  private static final String GENERAL_MESSAGE = "GENERAL MESSAGE";
+
   
-    // TODO
-  private CloudNode(String peerURL, TPTransportContainer tptc, 
-		    MessageHandler mh) {
+  public CloudNode(String host, String name, int port,
+                    String peerURL,
+                    TPTransportContainer tptc,
+                    MessageHandler mh) {
+    this(host, name, port, null, peerURL, tptc, mh);
   }
 
   private CloudNode(String capabilityFile, String peerURL) {
-    _wvm = new WVM(this, null, null);
-    _capability = new Capability(capabilityFile, _wvm);
+    this(null, null, 0, capabilityFile, peerURL, null, null);
+  }
+  private CloudNode(String host, String name, int port, String peerURL,
+                    String capabilityFile,
+                    TPTransportContainer tptc,
+                    MessageHandler mh) {
+
+    _wvm = new WVM(this, host, name, port);
+    _capability = new Capability(capabilityFile, tptc, _wvm);
+
+    _msgHandler = mh;
 
     _peers = new Vector();
     _masterOf = new Vector();
@@ -114,6 +131,12 @@ class CloudNode implements Runnable {
           // need to associate an existing Capability object with this request
           Capability c = null; // find out the real peer
           _wvm.messageQueueMsgs.get(replicatedData);
+
+        } else if (messageType.equals(GENERAL_MESSAGE)) {
+          Object o = _wvm.messageQueueMsgs.get(uniqueKey);
+          if (_msgHandler != null) {
+            _msgHandler.handleMessage(o);
+          }
 
         } else {
           // 2-do: silly-ass comment
@@ -163,7 +186,8 @@ class CloudNode implements Runnable {
     */
   }
 
-  public sendMessage(String peerUrl, Serializable s) {
+  public boolean sendMessage(String peerURL, Serializable s) {
+    return _wvm.sendMessage(GENERAL_MESSAGE, s, peerURL);
   }
 
   private static final int WAIT_TIMEOUT = 1000;

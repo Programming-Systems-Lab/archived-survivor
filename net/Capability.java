@@ -25,8 +25,10 @@ class Capability implements Serializable {
   final int _wvmPort;
   final int _wvmRMIPort;
   Properties _properties;
+
+  final TPTransportContainer _tptc;
   
-  Capability(String file, WVM wvm) {
+  Capability(String file, TPTransportContainer tptc, WVM wvm) {
     _hostIP     = wvm.getWVMAddr();
     _wvmName    = wvm.getWVMName();
     _wvmPort    = wvm.getWVMPort();
@@ -40,6 +42,8 @@ class Capability implements Serializable {
       } catch (IOException ioe) {
       }
     } else _properties = null;
+
+    _tptc = tptc;
   }
   
   String toURL() {

@@ -1,4 +1,3 @@
-package psl.survivor.net;
 import java.io.Serializable;
 import java.util.Vector;
 public class VTransportContainer implements Serializable {

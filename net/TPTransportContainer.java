@@ -2,6 +2,7 @@ package psl.survivor.net;
 
 import java.util.ArrayList;
 import java.io.Serializable;
+
 /**
  * Eventually this will all be xml, but not for now.
  */
