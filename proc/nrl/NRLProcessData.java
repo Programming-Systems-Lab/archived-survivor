@@ -1,6 +1,7 @@
 package psl.survivor.proc.nrl;
 
 import java.util.Hashtable;
+import java.util.HashMap;
 import java.io.Serializable;
 
 /**
@@ -12,7 +13,7 @@ import java.io.Serializable;
 public class NRLProcessData implements Serializable {
   
     /** The parameter that gets passed */
-    public Object param = null;
+    public HashMap param = null;
 
   /** workflow identifier */
   public String workflowName = null;

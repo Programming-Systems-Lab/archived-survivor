@@ -24,6 +24,7 @@ import java.io.FilenameFilter;
 import java.io.FileInputStream;
 
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Hashtable;
 
@@ -60,7 +61,7 @@ public class NRLProcessor extends Processor {
 
   // BEGIN: Inherited from psl.survivor.proc.Processor /////////////////////////
 
-    private static Object _latestParam;
+    private static HashMap _latestParam;
 
   /** Initialise and setup processor */
   public NRLProcessor(String name, int tcpPort, String rmiName, 
@@ -90,7 +91,8 @@ public class NRLProcessor extends Processor {
     final NRLProcessData processData = (NRLProcessData) theTask.data2();
 
     // TODO Modify nrl's code to not use RMI, and get rid of this
-    _latestParam = processData.param;
+    
+    _latestParam.putAll(processData.param);
 
     final Object instanceId = processData.instanceId;
     try {
@@ -387,12 +389,12 @@ public class NRLProcessor extends Processor {
     }
   }
 
-    public static void setObject(Object o) {
-	_latestParam = o;
+    public static void setObject(String key, Object o) {
+	_latestParam.put(key, o);
     }
 
-    public static Object getObject() { 
-	return _latestParam; 
+    public static Object getObject(String key) { 
+	return _latestParam.get(key); 
     }
   
 }
