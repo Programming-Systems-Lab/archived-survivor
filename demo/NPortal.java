@@ -32,7 +32,7 @@ import psl.survivor.proc.nrl.NRLProcessData;
 import psl.survivor.proc.TaskProcessorHandle;
 
 import psl.survivor.util.Version;
-
+import psl.survivor.util.NameValuePair;
 
 import java.awt.event.*;
 import java.awt.*;
@@ -128,26 +128,52 @@ public final class NPortal {
     _frame.show();
   }
   
+  // Processor-capability CELL-RENDERER /////////////////////////////
+  final static class ProcCellRenderer extends JPanel implements ListCellRenderer {
+    final Font headerFont = new Font("Verdana", Font.BOLD, 18);
+    final Font regularFont = new Font("Verdana", Font.PLAIN, 12);
+    final JLabel _key = new JLabel();
+    final JLabel _val = new JLabel();
+    ProcCellRenderer() {
+      setLayout(new GridLayout(1, 2, 5, 5));
+      add(_key); add(_val);
+    }
+    public Component getListCellRendererComponent(JList list,
+        Object value, int index, boolean isSelected, boolean cellHasFocus) {
+      if (value.toString().equals("HEADER")) {
+        _key.setText("Capability name");
+        _val.setText("Capability value");
+        _key.setFont(headerFont);
+        _val.setFont(headerFont);
+        setBackground(Color.gray);
+      } else if (value instanceof NameValuePair) {
+        NameValuePair nvp = (NameValuePair) value;
+        _key.setText("" + nvp.getName());
+        _val.setText("" + nvp.getValue());
+        _key.setFont(regularFont);
+        _val.setFont(regularFont);
+        setBackground(Color.lightGray);
+      }
+      return this;
+    }
+  }
+  
+  final JPanel _procPanel;
+  final JScrollPane _procScrollPane;
+  final DefaultListModel _procListModel = new DefaultListModel();
+  final JList _procList = new JList(_procListModel);
+  
   /**
    * initialise the processor-info display panel
    * 
    */
-  final JPanel _procPanel;
-  final JScrollPane _procScrollPane;
   private JScrollPane initProcPanel() {
-    JTable table = new JTable(
-      // replace the following line with the capability list from Processor
-      // split up into key-value pairs
-      new Object[][] {{"aKey", "value"}, {"anotherKey", "value"}}, 
-      new String[] {"KEYS", "VALUES"}) {
-        public boolean isCellEditable(int row, int col) {
-          return false;
-        }
-      };
+    _procList.setCellRenderer(new ProcCellRenderer());
+    _procListModel.addElement("HEADER");
     
     _procPanel.setLayout(new BorderLayout());
     _procPanel.add(new JLabel("Processor capabilities"), BorderLayout.NORTH);
-    _procPanel.add(table, BorderLayout.CENTER);
+    _procPanel.add(_procList, BorderLayout.CENTER);
     
     return (_procScrollPane);
   }
@@ -188,7 +214,7 @@ public final class NPortal {
         _labelState.setText("State");
         _labelProgress.setText("Progress");
         _panelProgress.setBackground(Color.gray);
-
+        setBackground(Color.gray);
         if (_labelProc != null) {
           _labelProc.setFont(headerFont); 
           _labelProc.setText("Processor");
@@ -202,6 +228,8 @@ public final class NPortal {
 
         _labelTask.setText(di._taskName);
         _labelProgress.setText("");
+
+        setBackground(Color.lightGray);
 
         if (_labelProc == null) {
           // running|finished|killed|resultDisposed
@@ -467,6 +495,7 @@ public final class NPortal {
     public void addedCapability(Object o) {
       // find out the type of o, and use it somehow to update the
       // JTable in _procPanel
+      _procListModel.addElement(o);
     }
   }
   
