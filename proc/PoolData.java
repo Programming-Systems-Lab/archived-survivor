@@ -1,9 +1,19 @@
 package psl.survivor.proc;
 import java.util.ArrayList;
 
+
+/**
+ * Internal representation of remote Processors and Replicators.
+ *
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu)
+ * @author Gaurav Kc (gskc@cs.columbia.edu)
+ */
 public class PoolData {
     
+    /** Handle to remote processors */
     private ArrayList _processorHandles;
+
+    /** Processor associated with this PoolData */
     private Processor _processor;
 
     /**
@@ -14,6 +24,9 @@ public class PoolData {
 	_processor = p;
     }
 
+    /**
+     * Add a remoteProcessor
+     */
     public void addProcessor(TaskProcessorHandle tph) {
 	if (!_processorHandles.contains(tph)) {
 	    for (int i = 0; i < _processorHandles.size(); i++) {
@@ -24,8 +37,16 @@ public class PoolData {
 	}
     }
 
+    /** 
+     * Get all the remote processors that we know about 
+     */
     public ArrayList getProcessors() { return _processorHandles; }
 
+    /**
+     * Given the definition of a task we need to execute, return
+     * an ArrayList of processors that can potentially handle executing
+     * that task.
+     */
     public ArrayList getValidProcessors(TaskDefinition td) {
 	
 	ArrayList returnValue = new ArrayList();
@@ -35,7 +56,9 @@ public class PoolData {
 		TaskProcessorHandle tph = (TaskProcessorHandle) 
 		    _processorHandles.get(i);
 		if (psl.survivor.ProcessorMain.debug) System.out.println("checking out taskHandle:" + tph);
-		if (tph.match(td)) {
+		// see if the processors's capabilities
+		// match the TaskDefintion's requirements
+		if (tph.match(td)) { 
 		    returnValue.add(tph);
 		}
 	    }
@@ -43,6 +66,10 @@ public class PoolData {
 	return returnValue;
     }
 
+    /**
+     * Check to see if a tph is valid (aka up and running and responding
+     * over the net). If it is not, let's remove it from our knowledge base.
+     */
     public void testValidity(TaskProcessorHandle tph) {
 	try {
 	    if (tph.valid(_processor)) {
@@ -56,6 +83,9 @@ public class PoolData {
 	}
     }
     
+    /**
+     * Send a message to everyone we know about to shutdown.
+     */
     public void shutdown() {
       synchronized (_processorHandles) {
         for (int i=0; i<_processorHandles.size(); i++) {
@@ -66,6 +96,10 @@ public class PoolData {
       }
     }
 
+    /**
+     * String representation of a PoolData.
+     * Just a list of the handles that it knows about seperated by newlines.
+     */
     public String toString() {
 	String s = "";
 	synchronized(_processorHandles) {

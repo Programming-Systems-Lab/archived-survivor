@@ -7,18 +7,37 @@ import java.util.TreeMap;
 import java.util.Date;
 import java.util.Set;
 import psl.survivor.util.*;
+
+/**
+ * Used to replicator partial workflow states as well as making sure
+ * that Processors executing the workflow can survive adverse conditions.
+ *
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu)
+ * @author Gaurav Kc (gskc@cs.columbia.edu)
+ */
 public class Replicator implements Runnable {
     
     private final int _TIME_TO_PROCESS = 10 * 1000;
-
     private int _SLEEP_TIME = 1000;
     private int _executionThreshold = 1000*60;
+
+    /** Workflow states that we know about */
     private VersionCache _versionCache;
+
+    /** Ability to cross reference versions to find the most appropriate */
     private TreeMap _versionLookup;
-    private ArrayList _versions;
+
+    /** Tasks currently executing at remote processors that we are
+     * monitoring */
     private TreeMap _tasksInProgress;
+    
+    /** Name of this Replicator */
     private String _name;
+
+    /** Information about other Processors */
     private PoolData _poolData;
+
+    /** The local processor to this Replicator */
     private Processor _processor; 
     
     /** CTOR */
@@ -28,7 +47,6 @@ public class Replicator implements Runnable {
 	_poolData = p.getPoolData();
 	_tasksInProgress = new TreeMap();
 	_versionLookup = new TreeMap();
-	_versions = new ArrayList();
     }
     public ReplicatorHandle getHandle() {
 	return new ReplicatorHandle(_name, _processor.getHostName(), 
