@@ -1,3 +1,4 @@
+- extract WF-Name from the XML file, and make available to Processor.java
 - global logging + standardize error messages
 - hierarchy for net/*containers -or- unify net/*containers into one
   container
