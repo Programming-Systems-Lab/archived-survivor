@@ -60,6 +60,7 @@ public class TaskProcessorHandle implements Serializable {
     public void executeTask(Version theTask, Processor p) {
 	VTransportContainer t = new VTransportContainer
 	    (_name, _hostname, _port);
+	System.out.println("PSL! going to invoke t.setExecuteTask(...): " + theTask); // 2-do: remove
 	t.setExecuteTask(theTask);
 	p.getMessageHandler().sendMessage(t);
     }

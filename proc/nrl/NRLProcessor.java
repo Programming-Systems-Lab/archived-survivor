@@ -36,21 +36,19 @@ public class NRLProcessor extends Processor {
   private final Hashtable _resultDataStorage = new Hashtable();
 
   private final String wfRootDir;
-  private final String wfName;
-  private final String namePrefix;
+  private String wfName;
+  private String namePrefix;
   
   private final int rmiPort;
 
   // BEGIN: Inherited from psl.survivor.proc.Processor /////////////////////////
   public NRLProcessor(String name, int tcpPort, String rmiName, 
                       String wfDefPath) {
-      super(name, tcpPort, rmiName, wfDefPath);
+      super(name, tcpPort, rmiName, wfDefPath);      System.out.println("NRLProcessor: " + name + ":" + tcpPort + "/" + rmiName);
 
       wfRootDir = wfDefPath;
-      wfName = "A_WORKFLOW"; // todo: need to get real wfName
-      namePrefix = wfName; // todo: what is this really supposed to be?
-      
       rmiPort = WVM_Host.PORT;
+
       // BEGIN: Inherited from wfruntime.ServiceHost_Serv ///
       try {
 	  _serviceHost = new ServiceHost_Serv(rmiPort, wfDefPath) {
@@ -122,16 +120,18 @@ public class NRLProcessor extends Processor {
     NRLProcessData processData = (NRLProcessData) theTask.data2();
 
     // need to get the following from 'taskData'
-    Object instanceId = processData.instanceId;
+    wfName = processData.workflowName;
+    namePrefix = wfName;    Object instanceId = processData.instanceId;
     String originTask = processData.originTask;
     String state = processData.state;
     Hashtable paramTable = processData.paramTable;
-    String thisTaskName = processData.nextTaskName;
+    String thisTaskName = processData.nextTaskName; 
+    // BIG PROBLEM HERE!! thisTaskName should NOT be null .. and it is!!!
 
     // TODO need to fix the instanceId to be unique per task, not workflow
     try {
       resetTask(thisTaskName); // copied from WFLoader
-      // this will internally call beginScheduler(...)
+      log("PSL! returned from resetTask, now calling _scheduler.transition(...): instanceId: " + instanceId + ", originTask: " + originTask + ", state: " + state + ", paramTable: " + paramTable); // 2-do: remove
   
       _scheduler.transition(instanceId, originTask, state, paramTable);
     } catch (RemoteException re) {
@@ -157,32 +157,61 @@ public class NRLProcessor extends Processor {
     TaskDefinition td = new TaskDefinition(resultData.nextTaskName);
     td.addRequirement(new NameValuePair(resultData.nextTaskName, "true"));
 
-    Version result = theTask.split2(resultData, td);
+    Version result = theTask.split2(td, resultData); // ya had these reversed :)
 
     if (result == null) System.out.println("|||||||||||\\\\\\ bad");
 
     return result;
   }
 
-  public void startWorkflow() {
-        log(_processorName);
-	log(_tcpPort);
-	log(_wfDefPath);
-	for (int i = 0; i < _capabilities.size(); i++) {
-	    log(_capabilities.get(i).toString());
+	public void	startWorkflow(String wfName_iKey) {
+    log(_processorName);
+    log(_tcpPort);
+    log(_wfDefPath);
+    log(wfName_iKey);
+    for	(int i = 0;	i	<	_capabilities.size();	i++) {
+      log(_capabilities.get(i).toString());
+    }
+    /**
+     * TODO: need to do what WFManager does
+     * ConfigInfo, StartTask, StartHost, InstanceKey, InitialBindings(empty), StartNode->transition();
+     * Notes: need different behaviour for top-level WFManager, and 
+     * nested WFManagers ... mainly to do with bindings, schedulers, etc
+    */
+    int separator = wfName_iKey.indexOf('-');
+    wfName = wfName_iKey.substring(0, separator);
+    String _iKey = wfName_iKey.substring(separator+1);
+
+    // BEGIN: Inherited from wfruntime.WFManager_Serv ///
+    ConfigInfo _config = null;
+    try {
+      _config = SpecParser.parseConfig(new File(_wfDefPath,"workflows"+File.separatorChar+wfName+File.separatorChar+"config"));
+    } catch (Throwable t) {
+      System.err.println("Throwable in startWorkflow: parseConfig");
+      t.printStackTrace();
+    }
+    String _startTask = _config.getStartTask();
+    // StartHost: no need to get _config.getStartHost() here ... 
+    // InstanceKey: same as npd.instanceId below
+    // InitialBindings(empty): same as npd.paramTable below
+    // ENDED: Inherited from wfruntime.WFManager_Serv ///
+
+    // TODO	actually start the first task	on an	appropriate	host
+    TaskDefinition td	=	new	TaskDefinition("START");
+    NRLProcessData npd = new NRLProcessData();
+    
+    npd.workflowName = wfName;
+    npd.instanceId = new Integer(_iKey);
+    npd.originTask = "START";
+    npd.state	=	"Success";
+    npd.nextTaskName = _startTask;
+    npd.paramTable = new Hashtable();
+
+    Version	v	=	new	Version(td);
+    v.setData2(npd);
+    log("PSL!	going	to invoke	executeRemoteTask(...)");	// 2-do: remove
+    executeRemoteTask(v);
 	}
-	// TODO actually start the first task on an appropriate host
-	TaskDefinition td = new TaskDefinition("START");
-	NRLProcessData npd = new NRLProcessData();
-	npd.instanceId = new Integer(5); // TODO fix
-	npd.originTask = "START";
-	npd.state = "Success";
-	npd.nextTaskName = null;
-	npd.paramTable = new Hashtable();
-        Version v = new Version(td);
-	v.setData2(npd);
-	executeRemoteTask(v);
-  }
 
 // ENDED: Inherited from psl.survivor.proc.Processor /////////////////////////
 
@@ -193,6 +222,7 @@ public class NRLProcessor extends Processor {
    * and internally call beginScheduler(...) on the local scheduler
   */
   public void resetTask(String taskName) throws Throwable {
+System.out.println("4: GOT AS FAR AS HERE!!!, wfName: " + wfName + ", taskName: " + taskName);
     final char sc = File.separatorChar;
     File              subDir      = new File(wfRootDir,"workflows"+sc+wfName+sc+taskName);
     RoutingInfo       theRouting  = SpecParser.parseRouting(new File(subDir,"routing"));
@@ -215,6 +245,7 @@ public class NRLProcessor extends Processor {
         }
       });
       
+log("PSL! inside resetTask: going to invoke theHost.putRealizationInClasspath(...): "); // 2-do: remove
       for (int i=0; i<files.length; i++)
         theHost.putRealizationInClasspath(wfName,taskName,files[i], readClassFile(new File(subDir,files[i])));
     }
@@ -240,6 +271,7 @@ public class NRLProcessor extends Processor {
           wfrealinfo.setStartHost(newLoader.getConfig().getHostForTask(wfrealinfo.getStartTask()));
         }
         */
+log("PSL! inside resetTask: going to beginScheduler(...): namePrefix: " + namePrefix); // 2-do: remove
         theHost.beginScheduler(taskName,theRouting,thePerms,creates,dTypes,exceptions,namePrefix,theConfig,fTypes,rinfo);
      }
     } catch (Throwable t) {

@@ -154,7 +154,8 @@ public class Processor implements Runnable {
 	return null;
     }
 
-    protected void executeRemoteTask(final Version theTask) {
+    protected void executeRemoteTask(final Version theTask) {      System.out.println("PSL! entered executeRemoteTask: theTask.data(): " + theTask.data().getClass().getName());
+      System.out.println("PSL! entered executeRemoteTask: theTask.data2(): " + theTask.data2().getClass().getName());
 	TaskDefinition td = (TaskDefinition) theTask.data();
 	ArrayList al = _poolData.getValidProcessors(td);
 	log("number of valid processors:" + al.size());
@@ -169,6 +170,7 @@ public class Processor implements Runnable {
 		final Processor p = this;
 		Thread t = new Thread() {
 			public void run() {
+			    log("PSL! going to invoke tph2.executeTask(...)"); // 2-do: remove
 			    tph2.executeTask(theTask, p);
 			}
 		    };
@@ -203,7 +205,7 @@ public class Processor implements Runnable {
 	}
     }
 
-    public void startWorkflow() {
+    public void startWorkflow(String wfName) {
 	log(_processorName);
 	log(_tcpPort);
 	log(_wfDefPath);

@@ -75,7 +75,7 @@ public class ProcessorMain {
 
         setupListener(lPort, pm.getFirstProcessor());
     } 
-
+    private static final String CMD_SHUTDOWN = "shutdown";    private static final String CMD_STARTWF = "start wf: ";    
     private static void setupListener(final int port, final Processor proc) {
       if (port <= 0) return;
 
@@ -97,12 +97,12 @@ public class ProcessorMain {
                 BufferedReader br = new BufferedReader(isr);
                 String command = br.readLine().toLowerCase();
 
-                if (command.startsWith("shutdown")) {
+                if (command.startsWith(CMD_SHUTDOWN)) {
                   System.out.println("Received a shutdown request");
                   System.exit(0);
-                } else if (command.startsWith("start wf")) {
+                } else if (command.startsWith(CMD_STARTWF)) {
                   System.out.println("Received a start request");
-                  proc.startWorkflow();
+                  proc.startWorkflow(command.substring(CMD_STARTWF.length()));
                 }
 
                 System.out.println("received command: " + command);

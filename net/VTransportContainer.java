@@ -92,4 +92,8 @@ public class VTransportContainer implements Serializable {
     public TaskProcessorHandle getSendNewHandle() { return _tph; }
     public boolean isSendPool() { return _state == 15; }
     public ArrayList getSendPool() { return _al; }
+
+    public String toString() {
+      return "VTransportContainer: [" + _state + ", " + _identifier + ", " + _v + "]";
+    }
 }

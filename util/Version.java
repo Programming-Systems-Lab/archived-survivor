@@ -177,6 +177,7 @@ public class Version implements Comparable, Serializable {
 	    returnValue += " : " +_identifiers.get(i);
 	}
 	returnValue += " => " + _data;	    
+	returnValue += " => " + _data2;
 	return returnValue;
     }
 }
