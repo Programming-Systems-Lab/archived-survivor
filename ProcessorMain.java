@@ -93,6 +93,7 @@ public class ProcessorMain {
         setupListener(lPort, pm.getFirstProcessor());
     } 
     private static final String CMD_SHUTDOWN = "shutdown";    
+    private static final String CMD_SHUTDOWN_ALL = "shutdown all";
     private static final String CMD_STARTWF = "start wf: ";    
     private static final String CMD_CLOUD = "cloud";
     private static final String CMD_QUIT = "quit";
@@ -123,11 +124,12 @@ public class ProcessorMain {
 		    if (command.startsWith(CMD_SHUTDOWN)) {
 			System.out.println("Received a shutdown request");
 			System.exit(0);
-		    /*
-		    } else if (command.startsWith(CMD_STARTWF)) {
+		    } else if (command.startsWith(CMD_SHUTDOWN_ALL)) {
+			System.out.println("Received a shutdown-all request");
+			System.exit(0);
+		    /* } else if (command.startsWith(CMD_STARTWF)) {
 			System.out.println("Received a start request");
-			proc.startWorkflow(command.substring(CMD_STARTWF.length()));
-		    */
+			proc.startWorkflow(command.substring(CMD_STARTWF.length())); */
 		    } else if (command.startsWith(CMD_CLOUD)) {
 			System.out.println("Received a cloud status request");
 			PoolData pd = proc.getPoolData();

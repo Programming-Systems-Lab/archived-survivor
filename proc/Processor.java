@@ -301,6 +301,11 @@ public abstract class Processor implements Runnable {
         System.exit(0);
     }
 
+    public void shutdownAll() {
+        System.out.println("Shutting down network, received halt command!");
+        _poolData.shutdown();
+    }
+
     public void findRemoteProcessor(final Version theTask, ArrayList visited) {
 	TaskDefinition td = (TaskDefinition) theTask.data();
 	ArrayList al = _poolData.getValidProcessors(td);
