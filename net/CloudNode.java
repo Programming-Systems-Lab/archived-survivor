@@ -101,6 +101,10 @@ public class CloudNode implements Runnable {
     _masterOf = new Vector();
     _slaveFor = new Vector();
     _data = new Hashtable();
+
+    if (_msgHandler != null) {
+	_msgHandler.setCloudNode(this);
+    }
     
     // add own capability into local 'knowledge-base' of network
     _peers.addElement(_capability);

@@ -19,5 +19,11 @@ public class RTransportContainer implements Serializable {
 	if (!_capabilities.contains(o)) {
 	    _capabilities.add(o);
 	}
-    }
+    }  
+    public String getName() { return _name; }
+    public String getHostName() { return _hostname; }
+    public int getPort() { return _port; }
+    public ArrayList getCapabilities() { return _capabilities; }
+    public int getSize() { return _capabilities.size(); }
+    public Object getCapability(int i) { return _capabilities.get(i); }
 }

@@ -3,42 +3,60 @@ package psl.survivor.proc;
 import java.util.Vector;
 
 import psl.survivor.util.*;
+import psl.survivor.net.*;
 
 public class ReplicatorHandle {
     
-    private String _name;
+    private String _name; 
+    private String _hostname;
+    private int _port;
     /**
      * CTOR
      */
-    public ReplicatorHandle(String name) {
+    public ReplicatorHandle(String name, String hostname, int port) {
 	_name = name;
+	_hostname = hostname;
+	_port = port;
     }
 
     public String getName() { return _name; }
-
-    public void alertExecutingTask(Version v) {
+    public String getHostName() { return _hostname; }
+    public int getPort() { return _port; }
+    
+    public void alertExecutingTask(Version v, Processor p) {
 	Version v1 = v.split(null); // no need to move the actual object around
-	// NEED TO REMOTELY GET IN TOUCH WITH THE PROCESSOR
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setAlertExecutingTask(v1);
+	p.getMessageHandler().sendMessage(t);
     }
 
-    public void alertDoneExecutingTask(Version v) {
+    public void alertDoneExecutingTask(Version v, Processor p) {
 	Version v1 = v.split(null); // no need to move the actual object around
-	// NEED TO REMOTELY GET IN TOUCH WITH THE PROCESSOR
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setAlertDoneExecutingTask(v1);
+	p.getMessageHandler().sendMessage(t);
     }
 
-    public void replicate(Version v, Vector replicatorQueue) {
-	// NEED TO REMOTELY GET IN TOUCH WITH THE PROCESSOR
+    public void replicate(Version v, Vector replicatorQueue, Processor p) {
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setReplicate(v, replicatorQueue);
+	p.getMessageHandler().sendMessage(t);
     }
 
     /** WE DO NOT NEED TO IMPLEMENT THIS RIGHT NOW, WE JUST USE THE 
 	LARGEST UID ALGORITHM */
-    public void mediate(Version v) {
+    public void mediate(Version v, Processor p) {
 	// NEED TO REMOTELY GET IN TOUCH WITH THE PROCESSOR
     }
 
-    // THIS CURRENTLY IS A REVERSE CALL. THIS NEEDS TO BE FIXED 
-    // ACTUAL, I DON'T THINK IT'S A REVERSE CALL ANYLONGER 
-    public boolean ping() {
-	return true;
+    public boolean ping(Processor p) {
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setReplicatorPing();
+	return p.getMessageHandler().sendReplicatorPing(t);
     }
 }
+

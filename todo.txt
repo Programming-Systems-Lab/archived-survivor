@@ -1,1 +1,16 @@
-- global logging
+- global logging + standardize error messages
+- hierarchy for net/*containers -or- unify net/*containers into one
+  container
+- separate monitors (just check if a host is up) from replicators 
+  (actually replicate data from a host)
+- standardize some of the arguments and names of files
+- differentiate between valid and ping (right now, they are treated
+  the same in the net layer, which is dumb)
+- make names in VTransportContainer more logical
+- *** get rid of the ugliness in which the handles are being used. we
+      should probably use some other class to invoke the transport
+      layer cleanly.
+- fix the replication of data (such as name, port and hostname) all
+  over the place.
+- swap the semantics meaning between valid and ping! It's currently
+  the opposite of what it should be.

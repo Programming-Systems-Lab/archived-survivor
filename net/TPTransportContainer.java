@@ -17,7 +17,7 @@ public class TPTransportContainer implements Serializable {
     public TPTransportContainer(Processor p) {
 	_name = p.getName();
 	_hostname = p.getHostName();
-	_port = p.getTcpPort();
+	_port = p.getPort();
 	ArrayList c = p.getCapabilities();
 	synchronized (c) {
 	    Iterator it = c.iterator();

@@ -14,6 +14,7 @@ public class Replicator implements Runnable {
     private HashMap _tasksInProgress;
     private String _name;
     private PoolData _poolData;
+    private Processor _processor; // TODO actually initialize this
     
     /** CTOR */
     public Replicator(String name) {
@@ -42,7 +43,7 @@ public class Replicator implements Runnable {
     private void survive(Version v) {
 	synchronized (_tasksInProgress) {
 	    TaskProcessorHandle tph = (TaskProcessorHandle)v.data();
-	    if (tph.ping(v.split(null))) return;
+	    if (tph.ping(v.split(null), _processor)) return;
 	    _tasksInProgress.remove(v);
 	    mediateSurvivor(v);
 	}
@@ -55,7 +56,7 @@ public class Replicator implements Runnable {
 	    for (int i = 0; i < vec.size(); i++) {
 		ReplicatorHandle rh = (ReplicatorHandle) vec.get(i);
 		if ((maxName.compareTo(rh.getName()) < 0) &&
-		    (rh.ping())) {
+		    (rh.ping(_processor))) {
 		    maxName = rh.getName();
 		    maxIndex = i;
 		}
@@ -75,11 +76,11 @@ public class Replicator implements Runnable {
 	    } else {
 		for (int i = 0; i < al.size(); i++) {
 		    TaskProcessorHandle tph = (TaskProcessorHandle) al.get(i);
-		    if (tph.valid()) {
+		    if (tph.valid(_processor)) {
 			final TaskProcessorHandle tph2 = tph;
 			Thread t = new Thread() {
 				public void run() {
-				    tph2.executeTask(theTask);
+				    tph2.executeTask(theTask, _processor);
 				}
 			    };
 			t.start();
@@ -103,12 +104,15 @@ public class Replicator implements Runnable {
 	    for (int i = 0; i < al.size(); i++) {
 		TaskProcessorHandle tph = (TaskProcessorHandle) al.get(i);
 		if (!tph.getName().equals(_name)) {
-		    tph.findRemoteProcessor(v, visited);
+		    tph.findRemoteProcessor(v, visited, _processor);
 		}
 	    }
 	}
 	System.err.println("very bad, we can't find a remote processor, we" +
 			   " cannot run the workflow");
+    }
+    public boolean ping() {
+	return true;
     }
     public void run() {
 	while (true) {
@@ -118,7 +122,7 @@ public class Replicator implements Runnable {
 		    Version v;
 		    TaskProcessorHandle tph = (TaskProcessorHandle)
 			(v = (Version)it.next()).data();
-		    if (!tph.ping(v.split(null))) {
+		    if (!tph.ping(v.split(null), _processor)) {
 			final Version v1 = v;
 			Thread t = new Thread() {
 				public void run() {

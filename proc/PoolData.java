@@ -4,6 +4,7 @@ import java.util.ArrayList;
 public class PoolData {
     
     private ArrayList _processorHandles;
+    private Processor _processor; // TODO initialize this
 
     /**
      * CTOR
@@ -38,7 +39,7 @@ public class PoolData {
 
     public void testValidity(TaskProcessorHandle tph) {
 	try {
-	    if (tph.valid()) {
+	    if (tph.valid(_processor)) {
 		return;
 	    }
 	} catch (Exception e) {

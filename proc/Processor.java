@@ -4,6 +4,7 @@ import java.util.Vector;
 import java.util.ArrayList;
 import java.net.*;
 import psl.survivor.util.*;
+import psl.survivor.net.*;
 public class Processor implements Runnable {
 
     private String _processorName;
@@ -18,6 +19,7 @@ public class Processor implements Runnable {
     private PoolData _poolData;
     private ArrayList _capabilities;
     private WorkflowData _workflowData;
+    private MessageHandler _messageHandler;
 
     private int _SLEEP_TIME = 500;
 
@@ -45,8 +47,11 @@ public class Processor implements Runnable {
 	_workflowData = new WorkflowData(_wfDefPath);
     }
 
+    public void setMessageHandler(MessageHandler mh) { _messageHandler = mh; }
+    public MessageHandler getMessageHandler() { return _messageHandler; }
+
     public String getName() { return _processorName; }
-    public int getTcpPort() { return _tcpPort; }
+    public int getPort() { return _tcpPort; }
     public String getWfDefPath() { return _wfDefPath; }
     public String getRmiName() { return _rmiName; }
     public String getHostName() { return _hostname; }
@@ -91,7 +96,7 @@ public class Processor implements Runnable {
 	    for (int i = 0; i < _replicatorQueue.size(); i++) {
 		ReplicatorHandle rh = (ReplicatorHandle) 
 		    _replicatorQueue.get(i);
-		rh.alertExecutingTask(theTask);
+		rh.alertExecutingTask(theTask, this);
 	    }
 	}	
     }
@@ -101,7 +106,7 @@ public class Processor implements Runnable {
 	    for (int i = 0; i < _replicatorQueue.size(); i++) {
 		ReplicatorHandle rh = (ReplicatorHandle) 
 		    _replicatorQueue.get(i);
-		rh.alertDoneExecutingTask(theTask);
+		rh.alertDoneExecutingTask(theTask, this);
 	    }
 	}	
     }
@@ -116,11 +121,12 @@ public class Processor implements Runnable {
 	ArrayList al = _poolData.getValidProcessors(td);
 	for (int i = 0; i < al.size(); i++) {
 	    TaskProcessorHandle tph = (TaskProcessorHandle) al.get(i);
-	    if (tph.valid()) {
+	    if (tph.valid(this)) {
 		final TaskProcessorHandle tph2 = tph;
+		final Processor p = this;
 		Thread t = new Thread() {
 			public void run() {
-			    tph2.executeTask(theTask);
+			    tph2.executeTask(theTask, p);
 			}
 		    };
 		t.start();
@@ -140,7 +146,7 @@ public class Processor implements Runnable {
 	    for (int i = 0; i < _replicatorQueue.size(); i++) {
 		ReplicatorHandle rh = (ReplicatorHandle) 
 		    _replicatorQueue.get(i);
-		rh.replicate(theTask, _replicatorQueue);
+		rh.replicate(theTask, _replicatorQueue, this);
 	    }
 	}
     }
@@ -166,11 +172,12 @@ public class Processor implements Runnable {
 	ArrayList al = _poolData.getValidProcessors(td);
 	for (int i = 0; i < al.size(); i++) {
 	    TaskProcessorHandle tph = (TaskProcessorHandle) al.get(i);
-	    if (tph.valid()) {
+	    if (tph.valid(this)) {
 		final TaskProcessorHandle tph2 = tph;
+		final Processor p = this;
 		Thread t = new Thread() {
 			public void run() {
-			    tph2.executeTask(theTask);
+			    tph2.executeTask(theTask, p);
 			}
 		    };
 		t.start();
@@ -193,13 +200,16 @@ public class Processor implements Runnable {
 		    }
 		}
 		if (!flag) {
-		    tph.findRemoteProcessor(v, visited);
+		    tph.findRemoteProcessor(v, visited, this);
 		    return;
 		}
 	    }
 	}
 	log("very bad, we can't find a processor to run this puppy");
     }
+
+    public boolean ping() { return true; }
+    public boolean valid() { return true; }
 
     private void log(String s) {
 	System.err.println(s);

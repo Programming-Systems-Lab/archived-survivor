@@ -1,11 +1,12 @@
 package psl.survivor.util;
 
 import java.util.ArrayList;
+import java.io.Serializable;
 
 /**
  * 
  */
-public class Version implements Comparable {
+public class Version implements Comparable, Serializable {
 
     private Object _data;
     private ArrayList _identifiers;

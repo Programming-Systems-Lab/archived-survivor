@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import psl.survivor.net.*;
 import psl.survivor.util.*;
+import psl.survivor.proc.*;
 
 public class TaskProcessorHandle {
     
@@ -23,22 +24,33 @@ public class TaskProcessorHandle {
 	_capabilities = tptc.getCapabilities();
     }
 
-    public boolean valid() {
-	// NEED TO REMOTELY GET IN TOUCH WITH THE PROCESSOR
-	return true;
+    public boolean valid(Processor p) {
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setValid();
+	return p.getMessageHandler().sendValid(t);
     }
 
-    public boolean ping(Version v) {
-	// NEED TO REMOTELY GET IN TOUCH WITH THE PROCESSOR
-	return true;
+    public boolean ping(Version v, Processor p) {
+	Version v1 = v.split(null); // no need to move the actual object around
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setPing(v1);
+	return p.getMessageHandler().sendPing(t);
     }
 
-    public void executeTask(Version theTask) {
-	// NEED TO REMOTELY GET IN TOUCH WITH THE PROCESSOR
+    public void executeTask(Version theTask, Processor p) {
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setExecuteTask(theTask);
+	p.getMessageHandler().sendMessage(t);
     }
 
-    public void findRemoteProcessor(Version v, ArrayList al) {
-	// NEED TO REMOTELY GET IN TOUCH WITH THE PROCESSOR
+    public void findRemoteProcessor(Version v, ArrayList al, Processor p) {
+	VTransportContainer t = new VTransportContainer
+	    (_name, _hostname, _port);
+	t.setFindRemoteProcessor(v, al);
+	p.getMessageHandler().sendMessage(t);
     }
 
     public boolean match(TaskDefinition td) {
@@ -68,3 +80,7 @@ public class TaskProcessorHandle {
     public int getSize() { return _capabilities.size(); }
     public Object getCapability(int i) { return _capabilities.get(i); }
 }
+
+
+
+
