@@ -1,5 +1,14 @@
-- GSKC: stop task
-        shutdown cloud
+- what to do when receive multiple requests to kill a certain task?
+- shutdown on Processor should do some cleanup:
+        + inform peers that it is going down
+        + maybe if some task is still running, refuse to shutdown, etc
+
+
+- what to do if receive request to run a task that is already executing, but
+  hasn't completed ... ie. is an 'endangered task'
+
+- GSKC: stop task ... done, I think ... 
+        shutdown cloud ... done, but need cleanup
 
 - JD: need to fix the versioning to have 3 version
       much other stuff

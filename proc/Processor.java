@@ -1,11 +1,18 @@
 package psl.survivor.proc;
+
+import java.util.Set;
 import java.util.Date;
 import java.util.Vector;
+import java.util.HashSet;
 import java.util.ArrayList;
-import java.net.*;
-import psl.survivor.util.*;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import psl.survivor.net.*;
-public class Processor implements Runnable {
+import psl.survivor.util.*;
+
+public abstract class Processor implements Runnable {
 
     protected String _processorName;
     protected int _tcpPort;
@@ -13,6 +20,7 @@ public class Processor implements Runnable {
     protected String _rmiName;
     protected String _hostname;
 
+    private Set _stoppedTasks;
     private VersionCache _versionCache;
     private Vector _taskQueue;
     private Vector _replicatorQueue;
@@ -31,6 +39,7 @@ public class Processor implements Runnable {
      */
     public Processor(String name, int tcpPort, String rmiName, 
 		     String wfDefPath) {
+	_stoppedTasks = new HashSet();
 	_versionCache = new VersionCache();
 	_taskQueue = new Vector();
 	_replicatorQueue = new Vector();
@@ -91,7 +100,7 @@ public class Processor implements Runnable {
 	if (!_capabilities.contains(o)) {
 	    _capabilities.add(o);
 	}
-    }  
+    }
 
     public ArrayList getCapabilities() {
 	return _capabilities;
@@ -140,6 +149,19 @@ public class Processor implements Runnable {
 
     public void executeTask(Version theTask) {
 
+	if (_stoppedTasks.contains(theTask)) {
+	  // todo: what to do here???
+	  // this task obviously didn't perform well .. 
+	  // and now, there's another request to run it!
+    if (true) {
+      // either try the task again ... 
+      _stoppedTasks.remove(theTask);
+    } else {
+      // or, refuse to run it at all 
+      return;
+    }
+	}
+
         System.out.println(" - - - - - - - - - - - PSL! entered executeTask, parameter version>  " + theTask);
 	// if (_versionCache.contains(theTask)) return;
 
@@ -152,29 +174,30 @@ public class Processor implements Runnable {
 	Version nextTask = executeTaskLocal(theTask);
 	// versioning happens here
 	// TODO remove nonsense hereunder
-	if (nextTask == null) {
+
+
+	if (_stoppedTasks.contains(theTask)) {
+	    // this task was supposed to be stopped .. can ignore result
+	    _stoppedTasks.remove(theTask);
+
+	} else if (nextTask == null) {
 	    System.out.println("WORKFLOW IS DONE");
 	    alertReplicatorsDoneExecutingTask(theTask);
+
 	} else {
 	    nextTask.append(taskName);
-	    
 	    // todo: 16-Feb maybe uncomment this?? _versionCache.addVersion(nextTask);
-	    
 	    queueTask(nextTask);
-	    
 	    System.out.println("WE DO NOT GET HERE");
-	    
 	    alertReplicatorsDoneExecutingTask(theTask);
 	}
     }
 
     public void stopTask(Version v) {
-	
-
 	System.err.println(" ##############################################################################################################################################################\nSTOP TASK WOULD BE HAPPENING NOW\n"+v+"\n##############################################################################################################################################################");
-
 	// WE NEED TO FIGURE OUT HOW TO DO THIS PROPERLY
 	// RIGHT NOW, CAN WE STOP A RUNNING TASK
+	_stoppedTasks.add(v);
     }
 
     private void alertReplicatorsExecutingTask(Version theTask) {
@@ -197,11 +220,7 @@ public class Processor implements Runnable {
 	}	
     }
 
-    protected Version executeTaskLocal(Version theTask) {
-	// NEED TO INTERACT WITH NRL'S CODE HERE
-	System.out.println("this is getting called?????????????????????????[][][][][][]][]");
-	return null;
-    }
+    protected abstract Version executeTaskLocal(Version theTask);
 
     protected void executeRemoteTask(final Version theTask) {
     	if (psl.survivor.ProcessorMain.debug) System.out.println("PSL! entered executeRemoteTask: theTask.data(): " + theTask.data().getClass().getName());
@@ -274,6 +293,12 @@ public class Processor implements Runnable {
 	    log(_capabilities.get(i).toString());
 	}
 	// TODO actually start the first task on an appropriate host
+    }
+
+    public void shutdown() {
+        // TODO: actually do some cleanup here!!!
+        System.out.println("Shutting down, received halt command!");
+        System.exit(0);
     }
 
     public void findRemoteProcessor(final Version theTask, ArrayList visited) {

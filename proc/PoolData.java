@@ -56,6 +56,16 @@ public class PoolData {
 	}
     }
     
+    public void shutdown() {
+      synchronized (_processorHandles) {
+        for (int i=0; i<_processorHandles.size(); i++) {
+          TaskProcessorHandle tph = (TaskProcessorHandle) _processorHandles.get(i);
+          // todo: send the shutdown message!!!
+          tph.shutdown(_processor);
+        }
+      }
+    }
+
     public String toString() {
 	String s = "";
 	synchronized(_processorHandles) {

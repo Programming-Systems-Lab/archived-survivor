@@ -85,10 +85,8 @@ public class ProcessorMain {
 
 	if ((name != null) && (hostname != null) && (port != -1)) {
 	    // TODO do the stuff for getting in touch with a remoteHost
-	    TaskProcessorHandle tph = 
-					new TaskProcessorHandle(name, hostname, port);
+	    TaskProcessorHandle tph = new TaskProcessorHandle(name, hostname, port);
 	    Processor p = pm.getFirstProcessor();
-	    
 	    tph.addToCloud(p);
 	}
 
