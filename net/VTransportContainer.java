@@ -8,7 +8,19 @@ import java.util.ArrayList;
 import psl.survivor.util.Version;
 import psl.survivor.proc.TaskProcessorHandle;
 
+/**
+ * Container sent over worklets containing messages from psl.survivor
+ * components to each other.
+ *
+ * Eventually should be xml based
+ * 
+ * @author Gaurav S. Kc (gskc@cs.columbia.edu)
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu) */
 public class VTransportContainer implements Serializable {
+
+    // This needs to be redone in a cleaner manner
+    // XML
+
     private String _name;
     private String _hostname;
     private int _port;  

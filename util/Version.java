@@ -4,7 +4,12 @@ import java.util.ArrayList;
 import java.io.Serializable;
 
 /**
- * 
+ * A Verion representing a certain partial execution of a workflow.
+ * A Version object really allows us to store some data along with 
+ * some information about where and how that data was executed until now.
+ *
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu)
+ * @author Gaurav S. Kc (gskc@cs.columbia.edu)
  */
 public class Version implements Comparable, Serializable {
 

@@ -31,14 +31,15 @@ import java.rmi.RemoteException;
 
 /**
  *
- * NRL's taskProcessor-specific implementation of psl.survivor.Processor.
- * This class translates an @see(executeTaskLocal) method invocation, and provides the
- * mapping to NRL's transition(..) function that actually executes the task
+ * NRL's taskProcessor-specific implementation of
+ * psl.survivor.Processor.  This class translates an
+ *
+ * @see(executeTaskLocal) method invocation, and provides the mapping
+ * to NRL's transition(..) function that actually executes the task
  * 
  * @author Jean-Denis Greze (jg253@cs.columbia.edu)
  * @author Gaurav S. Kc (gskc@cs.columbia.edu)
- * 
- */
+ *  */
 public class NRLProcessor extends Processor {
 
   /** to transfer results of task execution */
@@ -339,7 +340,7 @@ public class NRLProcessor extends Processor {
       String originTask = processData.originTask;
       String state = processData.state;
       Hashtable paramTable = processData.paramTable;
-      System.out.println("printing paramTable in resetTask: " + paramTable);
+      //      System.out.println("printing paramTable in resetTask: " + paramTable);
 
       // transition: moved in from executeTaskLocal
       _serviceHost._scheduler.transition(instanceId, originTask, state, paramTable);

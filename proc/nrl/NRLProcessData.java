@@ -5,6 +5,9 @@ import java.io.Serializable;
 
 /**
  * This class is used data transfer between different processes
+ *
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu)
+ * @author Gaurav S. Kc (gskc@cs.columbia.edu)
  */
 public class NRLProcessData implements Serializable {
   

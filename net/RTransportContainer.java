@@ -2,6 +2,16 @@ package psl.survivor.net;
 
 import java.util.ArrayList;
 import java.io.Serializable;
+
+
+/**
+ * Transport container for Replicator messages.
+ *
+ * Currently not used. VTransport Container used for all communications */
+ *
+ * @author Gaurav S. Kc (gskc@cs.columbia.edu)
+ * @author Jean-Denis Greze (jg253@cs.columbiae.edu)
+ */
 public class RTransportContainer implements Serializable {
     private String _name;
     private String _rmiName;

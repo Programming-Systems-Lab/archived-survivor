@@ -4,7 +4,12 @@ import java.util.SortedSet;
 import java.util.Iterator;
 
 /**
- * Way to keep track of versions and possible classes
+ * Way to keep track of versions and possible clashes. This provides
+ * for a way to get "latest" versions of a workflow in case we need
+ * to survive a partial workflow execution.
+ *
+ * @author Jean-Denis Greze (jg253@cs.columbia.edu)
+ * @author Gaurav S. Kc (gskc@cs.columbia.edu)
  */
 public class VersionCache {
 
