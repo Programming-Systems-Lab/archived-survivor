@@ -2,9 +2,11 @@ package psl.survivor.proc.nrl;
 
 import psl.worklets.WVM_Host;
 
+import psl.survivor.proc.Processor;
+import psl.survivor.proc.TaskDefinition;
+
 import psl.survivor.util.Version;
-import psl.survivor.proc.*;
-import psl.survivor.util.*;
+import psl.survivor.util.NameValuePair;
 
 import wfruntime.Output;
 import wfruntime.IScheduler;
