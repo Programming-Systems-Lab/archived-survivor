@@ -57,9 +57,12 @@ it join a group of processors ready to execute a workflow
 *** psl.survivor.net:
 This package uses worklets (psl.worklets) to implement communications
 between different Task Processors.
-o Capability.java - encapsulates the various task-processing of a Processor
+o Capability.java - encapsulates the various task-processing capabilities of a Processor
 o CloudNode.java - code actually responsible for using worklets to
-communicate
+communicate. This object represents the local Processor(s) objects in the
+overlaid network created for data-replication purposes. It uses the
+asynchronous message-passing mechanism among peer WVMs to assist in the
+transfer of data, and control during the workflow execution.
 o CompositeData.java - 
 o MessageHandler.java - used by processor to communicate to other
 Processors. This class is responsible for "packing" and "unpacking"
@@ -75,12 +78,19 @@ survivable Processing (aka executing workflows) and replication
 termination)
 
 *** psl.survivor.proc.nrl:
+This package contains the relevant specializations required to integrate Naval
+Research Lab's MLS workflow system into Survivor.
+o NRLProcessor.java - this is the major component in this package, it contains
+hooks that enable the proper setup of ServiceHost_Serv and Scheduler_Serv
+entities in a task processor. It is an extension of the Processor class from
+proc, and it invokes the appropriate methods in the NRL code so that the task
+is executed, and the return value is properly packaged for deliver to the next
+stage of the workflow execution.
+o NRLProcessData.java - this class encapsulates the different data that are
+passed between consecutive tasks as specified in the workflow definition.
 
 *** psl.survivor.util:
 
 *** psl.survivor.xml:
-
-
-
 
 
