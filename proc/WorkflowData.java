@@ -2,6 +2,8 @@ package psl.survivor.proc;
 
 import java.util.ArrayList;
 
+import psl.survivor.xml.TaskDefinitionBuilder;
+
 public class WorkflowData {
 
     private String _wfDefPath;

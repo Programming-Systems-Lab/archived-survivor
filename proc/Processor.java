@@ -2,7 +2,8 @@ package psl.survivor.proc;
 import java.util.Date;
 import java.util.Vector;
 import java.util.ArrayList;
-
+import java.net.*;
+import psl.survivor.util.*;
 public class Processor implements Runnable {
 
     private String _processorName;
@@ -31,16 +32,20 @@ public class Processor implements Runnable {
 	_poolData = new PoolData();
 	_capabilities = new ArrayList();
 	_processorName = name;
-	_wvmPort = wvmPort;
 	_tcpPort = tcpPort;
 	_wfDefPath = wfDefPath;
 	_rmiName = rmiName;
-	_hostname = InetAddress.getLocalHost().getHostname();
+	try {
+	    _hostname = InetAddress.getLocalHost().getHostName();
+	} catch (UnknownHostException e) {
+	    log(e.toString());
+	    _hostname = "";
+	}
 
 	_workflowData = new WorkflowData(_wfDefPath);
     }
 
-    public String get() { return _processorname; }
+    public String getName() { return _processorName; }
     public int getTcpPort() { return _tcpPort; }
     public String getWfDefPath() { return _wfDefPath; }
     public String getRmiName() { return _rmiName; }
@@ -148,7 +153,6 @@ public class Processor implements Runnable {
 
     public void startWorkflow() {
 	log(_processorName);
-	log(_wvmPort);
 	log(_tcpPort);
 	log(_wfDefPath);
 	for (int i = 0; i < _capabilities.size(); i++) {
