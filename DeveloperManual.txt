@@ -30,6 +30,7 @@ Survivor also uses mobile agents (psl.worklets) for communication
 aspects between different processors. The idea being that smart agents
 can be used to move version objects and restart the workflow.
 
+
 Testing
 -------
 
@@ -57,7 +58,8 @@ it join a group of processors ready to execute a workflow
 *** psl.survivor.net:
 This package uses worklets (psl.worklets) to implement communications
 between different Task Processors.
-o Capability.java - encapsulates the various task-processing capabilities of a Processor
+o Capability.java - encapsulates the various task-processing
+capabilities of a Processor
 o CloudNode.java - code actually responsible for using worklets to
 communicate. This object represents the local Processor(s) objects in the
 overlaid network created for data-replication purposes. It uses the
@@ -76,21 +78,77 @@ This package most of the classes responsible for implementating
 survivable Processing (aka executing workflows) and replication
 (keeping track of the workflow and making sure its execution reaches
 termination)
+o PoolData.java - used by processor to store its knowledge of other
+Processors and Replicators. A Pooldata object does not necessarly
+contain information about every Processor in existence, just the ones
+that the local processor knows about. Between all of the Processors'
+PoolData, it is possible to get a representation of the complete
+execution environment.
+o Processor.java - Major component responsible for execution of tasks
+as well as ensuring that there are replicators around to ensure
+survivability. The Processor class must be extended to work with a
+specific workflow implementation (such as NRL's). Processors are
+distributed.
+o Replicator.java - Component responsible for tracking the execution
+of the workflow. In case of failure or problem, Replicators take the
+steps necessary to keep executing the workflow. Replicator are
+distributed throughout the network. In general, every Processor has a
+Replicator, though it is possible to have Replicators with dummy
+Processors (that are unable to execute anything).
+o ReplicatorHandle.java - A handle to a replicator (which may be
+remote). By using handles, we can use worklets to communicate with
+them. Processors use ReplicatorHandles to announce how local task
+executions are going.
+o TaskDefinition.java - Internal representation of a taskdefinition
+xml-document. Task definitions give additonal requirements that a
+processor needs to have in order to be able to execute a certain task
+o TaskProcessorHandle.java - A handle to a processor (which may be
+remote). By using handles, we can use worklets to communicate with
+other processors. This is used to ask a remote processor to execute a
+certain task.
+o WorkflowData.java - Important information about the workflow as a
+whole. This includes all of that workflow's tasks' definitions.
 
 *** psl.survivor.proc.nrl:
-This package contains the relevant specializations required to integrate Naval
-Research Lab's MLS workflow system into Survivor.
-o NRLProcessor.java - this is the major component in this package, it contains
-hooks that enable the proper setup of ServiceHost_Serv and Scheduler_Serv
-entities in a task processor. It is an extension of the Processor class from
-proc, and it invokes the appropriate methods in the NRL code so that the task
-is executed, and the return value is properly packaged for deliver to the next
-stage of the workflow execution.
-o NRLProcessData.java - this class encapsulates the different data that are
-passed between consecutive tasks as specified in the workflow definition.
+This package contains the relevant specializations required to
+integrate Naval Research Lab's MLS workflow system into Survivor.
+o NRLProcessor.java - this is the major component in this package, it
+contains hooks that enable the proper setup of ServiceHost_Serv and
+Scheduler_Serv entities in a task processor. It is an extension of the
+Processor class from proc, and it invokes the appropriate methods in
+the NRL code so that the task is executed, and the return value is
+properly packaged for deliver to the next stage of the workflow
+execution.
+o NRLProcessData.java - this class encapsulates the different data
+that are passed between consecutive tasks as specified in the workflow
+definition.
 
 *** psl.survivor.util:
+This package contains utility classes that are used by survivor. The
+most important utility classes are the Version and VersionCache
+classes. Combined, these include the principle mechanism for keeping
+track of a workflow's partial executions for survivability purposes.
+o NameValuePair.java - Used for internal representation of
+Capabilities and Task Definitions.
+o Version.java - Represents a partial execution of a workflow, along
+with data to restart the workflow at that point. It also contains
+information about where and how the data was executed until then.
+o VersionCache.java - Data Structure used to keep track of different
+versions. It detects version clashes (this is important in detecting
+execution of a workflow branch that is no longer valid because of a
+survivability scenario). It also allows us to find the "latest"
+relevant version stored given an "ideal" version that we would like to
+find. This is helpful in restarting workflows where we have lost
+execution data and have to start a few steps back.
 
 *** psl.survivor.xml:
+This package provides utility classes for parsing xml documents and
+creating java objects.
+o ProcessorBuilder.java - From a Processor Capabilities xml, creates a
+Processor listenning on the correct ports, and using the correct
+extension of the Processor class. Used by ProcessorMain.java
+o TaskDefinitionBuilder.java - From a workflow description xml,
+creates task definition object for each task that might be executed.
 
-
+*** psl.survivor.test: This package contains data for workflows that
+were used for testing purposes.
