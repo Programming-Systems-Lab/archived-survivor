@@ -108,6 +108,7 @@ public class Processor implements Runnable {
 
     public void executeTask(Version theTask) {
 
+        System.out.println(" - - - - - - - - - - - PSL! entered executeTask, parameter version>  " + theTask);
 	if (_versionCache.contains(theTask)) return;
 
 	_versionCache.addVersion(theTask);
@@ -123,7 +124,7 @@ public class Processor implements Runnable {
 	}
 	nextTask.append(taskName);
 
-	_versionCache.addVersion(nextTask);
+	// todo: 16-Feb maybe uncomment this?? _versionCache.addVersion(nextTask);
 
 	replicate(nextTask);
 	queueTask(nextTask);

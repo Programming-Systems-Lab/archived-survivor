@@ -1,0 +1,5 @@
+<TaskProcessor name="tp1" RMIName="tp1" TCPPort="8008" WorkflowDefinitionPath="test/svr1">
+<Capability name="start" value="true"/>
+<Capability name="middle" value="true"/>
+<Capability name="end" value="true"/>
+</TaskProcessor>

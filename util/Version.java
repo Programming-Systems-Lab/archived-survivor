@@ -93,6 +93,8 @@ public class Version implements Comparable, Serializable {
 	    if (v.size() > this.size()) return -1;
 	    int size = v.size();
 	    for (int i = 0; i < size; i++) {
+                if (psl.survivor.ProcessorMain.debug) System.out.println("this.identifier: " + i + ": " + this._identifiers.get(i));
+                if (psl.survivor.ProcessorMain.debug) System.out.println("v.identifier: " + i + ": " + v._identifiers.get(i));
 		if (((Comparable)_identifiers.get(i)).compareTo
 		    (v.getIdentifier(i)) < 0) {
 		    return -1;
@@ -172,12 +174,13 @@ public class Version implements Comparable, Serializable {
      * representation of every identifier in the object in order.
      */
     public String toString() {
-	String returnValue =  "-- "+_identifiers.size();
+	String returnValue =  "-- id.size: "+_identifiers.size() + " (";
 	for (int i = 0; i < _identifiers.size(); i++) {
-	    returnValue += " : " +_identifiers.get(i);
+	    returnValue += _identifiers.get(i) + ", ";
 	}
-	returnValue += " => " + _data;	    
-	returnValue += " => " + _data2;
+	returnValue += ")\n";
+	returnValue += "\t-- _data => " + _data;	    
+	returnValue += "\t-- _data2 => " + _data2;
 	return returnValue;
     }
 }

@@ -54,7 +54,7 @@ public class NRLProcessor extends Processor {
   }
 
   protected Version executeTaskLocal(Version theTask) {
-      if (psl.survivor.ProcessorMain.debug) System.out.println("CORRECT\n\n\n");
+    if (psl.survivor.ProcessorMain.debug) System.out.println("CORRECT\n\n\n");
 
     NRLProcessData processData = (NRLProcessData) theTask.data2();
 
@@ -104,6 +104,7 @@ public class NRLProcessor extends Processor {
 
     if (psl.survivor.ProcessorMain.debug) if (result == null) System.out.println("|||||||||||\\\\\\ bad");
 
+    System.out.println(" - - - - - - - - - - - PSL! executeTaskLocal returning version> " + result);
     return result;
   }
 
@@ -112,7 +113,7 @@ public class NRLProcessor extends Processor {
     log(_tcpPort);
     log(_wfDefPath);
     log(wfName_iKey);
-    for	(int i = 0;	i	<	_capabilities.size();	i++) {
+    for	(int i=0; i<_capabilities.size(); i++) {
       log(_capabilities.get(i).toString());
     }
     /**
