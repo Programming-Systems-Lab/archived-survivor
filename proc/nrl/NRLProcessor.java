@@ -143,7 +143,7 @@ public class NRLProcessor extends Processor {
     _resultDataStorage.remove(instanceId.toString());
 
     TaskDefinition td = new TaskDefinition(resultData.nextTaskName);
-    td.addRequirement(new NameValuePair("tn", resultData.nextTaskName));
+    td.addRequirement(new NameValuePair(resultData.nextTaskName, "true"));
 
     Version result = theTask.split2(resultData, td);
 
