@@ -1,0 +1,76 @@
+All of the following workflows exhibit survivabilty scenarios on the
+following workflow:
+
+START -> start -> middle -> end -> END
+
+Test 1 - workflow execution
+node A: psl.survivor.ProcessorMain with test\svrt\tp1.xml
+node B: psl.survivor.ProcessorMain with test\svrt\tp2.xml
+node C: psl.survivor.ProcessorMain with test\svrt\tp4.xml
+
+start workflow on node A using the listener port
+workflow runs to completion
+
+
+Test 2 - workflow execution, kill needed node before the workflow gets
+there.  By providing an alternate node with the needed capabilities,
+the workflow will keep execution.
+
+node A: psl.survivor.ProcessorMain with test\svrt\tp1.xml
+node B: psl.survivor.ProcessorMain with test\svrt\tp2.xml
+node C: psl.survivor.ProcessorMain with test\svrt\tp3.xml
+node D: psl.survivor.ProcessorMain with test\svrt\tp4.xml
+
+start workflow on node A using the listener port
+kill node B before the workflow gets there
+workflow will go to alternate node and run to completion
+
+
+Test 3 - workflow execution, kill a node while the workflow is running
+there.  Replicator nodes will notice that the workflow's execution was
+compromised and will restart execution at the latest version.
+
+node A: psl.survivor.ProcessorMain with test\svrt\tp1.xml
+node B: psl.survivor.ProcessorMain with test\svrt\tp2.xml
+node C: psl.survivor.ProcessorMain with test\svrt\tp3.xml
+node D: psl.survivor.ProcessorMain with test\svrt\tp4.xml
+
+start workflow on node A using the listener port
+kill node B while the workflow is executing there
+workflow node B crash will be detected
+workflow will go to alternate node and run to completion.
+
+
+Test 4 - workflow execution, kill a node while the workflow is running
+there. Kill a replicator for that node. Another replicator will notice
+that the workflow's execution was compromised and will restart
+execution at the latest version.
+
+node A: psl.survivor.ProcessorMain with test\svrt\tp1.xml
+node B: psl.survivor.ProcessorMain with test\svrt\tp2.xml
+node C: psl.survivor.ProcessorMain with test\svrt\tp3.xml
+node D: psl.survivor.ProcessorMain with test\svrt\tp4.xml
+
+start workflow on node A using the listener port
+kill node B and node A while the workflow is executing on node B
+workflow node B crash will be detected by a replicator other than A.
+workflow will go to alternate node and run to completion.
+
+
+Test 5 - workflow partial execution. provide a node to finish
+execution dynamically. workflow will tun to completion.
+
+node A: psl.survivor.ProcessorMain with test\svrt\tp1.xml
+node B: psl.survivor.ProcessorMain with test\svrt\tp2.xml
+
+start workflow on node A.
+workflow will execute until node B.
+
+dynamically provide
+node C: psl.survivor.ProcessorMain with test\svrt\tp4.xml
+
+workflow will detect node with enough capabilities and will run to
+completion.
+
+
+

@@ -1,4 +1,3 @@
 <TaskProcessor name="tp4" RMIName="tp4" TCPPort="8014" WorkflowDefinitionPath="test/svr1" proctype="psl.survivor.proc.nrl.NRLProcessor">
-<Capability name="start" value="true"/>
-<Capability name="START" value="true"/>
+<Capability name="end" value="true"/>
 </TaskProcessor>

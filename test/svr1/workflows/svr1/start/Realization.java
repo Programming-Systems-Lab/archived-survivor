@@ -31,24 +31,23 @@ The following permissions are granted:
 
 public class Realization extends AbstractRealization{
 
-  	public void run(){
-    try{
+    public void run(){
+	try{
+	    
+	    System.out.println("RUNNING START TASK");
+	    try {
+		Thread.sleep(1000);
+	    } catch (Exception e) {
+	    }
+	    System.out.println("DONE RUNNING START TASK");
+	    	    
+	    psl.survivor.proc.nrl.NRLProcessor.setObject
+		("key", psl.survivor.demo.Input.getInput("say what?"));
 
-      System.out.println("Running the START task");
-      try {
-      Thread.sleep(1000);
-      } catch (Exception e) {
-      }
-
-      psl.survivor.proc.nrl.NRLProcessor.setObject("key", psl.survivor.demo.Input.getInput("say what?"));
-
-      System.out.println("DONE");
-      taskMgr().endTask(null);
-    }
-    catch(Exception e){
-
-      taskMgr().endTask(e);
-    }
-  }
-
+	    taskMgr().endTask(null);
+	}
+	catch(Exception e){
+	    taskMgr().endTask(e);
+	}
+    }    
 }

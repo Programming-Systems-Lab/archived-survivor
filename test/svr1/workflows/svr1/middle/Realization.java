@@ -34,11 +34,11 @@ public class Realization extends AbstractRealization{
   	public void run(){
     try{
 
-      System.out.println("Running the MIDDLE task");
-      try {
-	  Thread.sleep(2000);
+	System.out.println("RUNNING MIDDLE TASK");
+	try {
+	  Thread.sleep(1000);
       } catch (Exception e) {;}
-
+	System.out.println("DONE RUNNING MIDDLE TASK");
       psl.survivor.demo.Input.display("" + psl.survivor.proc.nrl.NRLProcessor.getObject("key"));
 
       taskMgr().endTask(null);

@@ -34,7 +34,8 @@ public class Realization extends AbstractRealization{
   	public void run(){
     try{
 
-      System.out.println("Running the END task");
+      System.out.println("RUNNING END TASK");
+      System.out.println("DONE RUNNING END TASK");
       taskMgr().endTask(null);
     }
     catch(Exception e){

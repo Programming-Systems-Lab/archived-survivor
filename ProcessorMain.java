@@ -65,7 +65,7 @@ public class ProcessorMain {
 	String hostname = null;
 	int port = -1;
         int lPort = -1;
-	for (int i = 0; i+1 < args.length; i+=2) {
+	for (int i = 0; i + 1 < args.length; i+=2) {
 	    if (args[i].equals("-f")) {
 		xmlPath = args[i+1];
 	    }
