@@ -36,9 +36,12 @@ public class Realization extends AbstractRealization{
 
       System.out.println("Running the START task");
       try {
-      Thread.sleep(5000);
+      Thread.sleep(1000);
       } catch (Exception e) {
       }
+
+      psl.survivor.proc.nrl.NRLProcessor.setObject("foo");
+
       System.out.println("DONE");
       taskMgr().endTask(null);
     }

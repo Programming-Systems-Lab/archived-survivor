@@ -38,6 +38,10 @@ public class Realization extends AbstractRealization{
       try {
 	  Thread.sleep(2000);
       } catch (Exception e) {;}
+
+      System.out.println(
+			 psl.survivor.proc.nrl.NRLProcessor.getObject());
+
       taskMgr().endTask(null);
     }
     catch(Exception e){
