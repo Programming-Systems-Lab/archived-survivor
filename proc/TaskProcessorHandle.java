@@ -3,11 +3,13 @@ package psl.survivor.proc;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import java.io.Serializable;
+
 import psl.survivor.net.*;
 import psl.survivor.util.*;
 import psl.survivor.proc.*;
 
-public class TaskProcessorHandle {
+public class TaskProcessorHandle implements Serializable {
     
     private String _name;
     private String _hostname;

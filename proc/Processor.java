@@ -90,7 +90,11 @@ public class Processor implements Runnable {
 	synchronized (al) {
 	    for (int i = 0; i < al.size(); i++) {
 		TaskProcessorHandle t = (TaskProcessorHandle) al.get(i);
-		t.sendNewHandle(tph, this);
+    if (t==null)  {
+      System.out.println("t == null");
+    } else {
+		  t.sendNewHandle(tph, this);
+    }
 	    }
 	    tph.sendPool(al, this);
 	}

@@ -19,6 +19,7 @@ public class TPTransportContainer implements Serializable {
 	_hostname = p.getHostName();
 	_port = p.getPort();
 	ArrayList c = p.getCapabilities();
+  _capabilities = new ArrayList();
 	synchronized (c) {
 	    Iterator it = c.iterator();
 	    while (it.hasNext()) {
@@ -30,6 +31,7 @@ public class TPTransportContainer implements Serializable {
 	_name = name;
 	_hostname = hostname;
 	_port = port;
+  _capabilities = new ArrayList();
     }    
     public void addCapability(Object o) {
 	if (!_capabilities.contains(o)) {

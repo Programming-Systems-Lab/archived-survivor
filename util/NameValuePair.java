@@ -1,5 +1,8 @@
 package psl.survivor.util;
-public class NameValuePair implements Comparable {
+
+import java.io.Serializable;
+
+public class NameValuePair implements Comparable, Serializable {
     private Comparable _name;
     private Comparable _value;
     public NameValuePair(Comparable name, Comparable value) {

@@ -73,7 +73,7 @@ public class CloudNode implements Runnable {
 
     // jeandenis
     // is this what you mean?
-    this(null, null, 0, peerURL, null, tptc, mh);
+    this(tptc.getHostName(), tptc.getName(), tptc.getPort(), peerURL, null, tptc, mh);
   }
   
   public CloudNode(String host, String name, int port,

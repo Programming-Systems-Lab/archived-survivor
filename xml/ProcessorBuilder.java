@@ -35,10 +35,13 @@ public class ProcessorBuilder {
 
     public void createCloudNode(String peer) {
 	Processor p = ((Processor)_processors.get(0)); // 1 processor only
+        MessageHandler mh = null;
 	
+  // System.out.println("Creating a cloudNode: " + peer);
 	CloudNode cn = new CloudNode(peer, new TPTransportContainer(p), 
-				     new MessageHandler
+				     mh = new MessageHandler
 					 (p, new Replicator(p.getName(), p)));
+        p.setMessageHandler(mh);
     }
 
     public Processor getFirstProcessor() {
@@ -110,7 +113,7 @@ public class ProcessorBuilder {
 	    _depth--;
 	    if (localName.equals("TaskProcessor")) {
 		if (_depth == 0) {
-		    Processor p = new Processor
+		    Processor p = new psl.survivor.proc.nrl.NRLProcessor
 			(_processorName, _tcpPort, _rmiName,
 			 _wfDefPath);
 		    for (int i = 0; i < _capabilities.size(); i++) {

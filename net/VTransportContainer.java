@@ -57,9 +57,9 @@ public class VTransportContainer implements Serializable {
     public void setReplicatorPing() { _state = 11; }
     public void setReplicatorPingResponse() { _state = 12; }
     public void setAddToCloud(TaskProcessorHandle tph) 
-    { _state = 13; tph = tph;}
+    { _state = 13; _tph = tph;}
     public void setSendNewHandle(TaskProcessorHandle tph) 
-    { _state = 14; tph = tph;}
+    { _state = 14; _tph = tph;}
     public void setSendPool(ArrayList al) { _state = 15; _al = al; }
 
     public boolean isAlertExecutingTask() { return _state == 1; }
