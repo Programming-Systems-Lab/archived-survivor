@@ -136,6 +136,7 @@ public final class NPortal {
   // TASK-INFO DISPLAY //////////////////////////////////////////////
   final JPanel _taskPanel;
   final DefaultListModel _taskListModel = new DefaultListModel();
+  final JList _taskList = new JList(_taskListModel);
   
   /**
    * initialise the task-info display panel
@@ -145,8 +146,7 @@ public final class NPortal {
     JScrollPane scrollPane = new JScrollPane(_taskPanel);
     // replace the following line with the capability list from Processor
     // split up into key-value pairs
-    JList list = new JList(_taskListModel);
-    list.setCellRenderer(new ListCellRenderer() {
+    _taskList.setCellRenderer(new ListCellRenderer() {
       public Component getListCellRendererComponent(JList list, 
           Object value, int index, boolean isSelected, boolean cellHasFocus) {
         JPanel panel = new JPanel(new GridLayout(1, 3, 5, 5));
@@ -180,7 +180,6 @@ public final class NPortal {
             l.setText("dispose result");
           }
         }
-        list.remove(panel);
         return panel;
       }
     });
@@ -188,7 +187,7 @@ public final class NPortal {
     
     _taskPanel.setLayout(new BorderLayout());
     _taskPanel.add(new JLabel("Task information"), BorderLayout.NORTH);
-    _taskPanel.add(list, BorderLayout.CENTER);
+    _taskPanel.add(_taskList, BorderLayout.CENTER);
     
     return (scrollPane);
   }
@@ -196,14 +195,14 @@ public final class NPortal {
   // REPLICATING-INFO DISPLAY ///////////////////////////////////////
   final JPanel _replPanel;
   final DefaultListModel _replListModel = new DefaultListModel();
+  final JList _replList = new JList(_replListModel);
   
   /**
    * initialise the replicating-info display panel
    */
   private JScrollPane initReplPanel() {
     JScrollPane scrollPane = new JScrollPane(_replPanel);
-    JList list = new JList(_replListModel);
-    list.setCellRenderer(new ListCellRenderer() {
+    _replList.setCellRenderer(new ListCellRenderer() {
       public Component getListCellRendererComponent(JList list, 
           Object value, int index, boolean isSelected, boolean cellHasFocus) {
         JPanel panel = new JPanel(new GridLayout(1, 4, 5, 5));
@@ -247,7 +246,7 @@ public final class NPortal {
     
     _replPanel.setLayout(new BorderLayout());
     _replPanel.add(new JLabel("Replication information"), BorderLayout.NORTH);
-    _replPanel.add(list, BorderLayout.CENTER);
+    _replPanel.add(_replList, BorderLayout.CENTER);
     
     return (scrollPane);
   }
@@ -346,15 +345,15 @@ public final class NPortal {
   final class Logger implements Log {
     
     private String taskName(Version v) {
-      // NRLProcessData npd = (NRLProcessData) v.data2();
-      if (global_TASKNAME != null) return global_TASKNAME;
-      return new java.util.Date().toString().substring(0, 10); // npd.nextTaskName;
+      if (v == null) return (global_TASKNAME!=null ? global_TASKNAME : new java.util.Date().toString().substring(0, 10));
+      NRLProcessData npd = (NRLProcessData) v.data2();
+      return (npd != null ? npd.nextTaskName : "npd null?"); // todo: for some reason, npd is null!
     }
 
     private String procName(Version v) {
-      // TaskProcessorHandle tph = (TaskProcessorHandle) v.data();
-      if (global_PROCNAME != null) return global_PROCNAME;
-      return new java.util.Date().toString().substring(0, 10); // tph.getName();
+      if (v == null) return (global_PROCNAME!=null ? global_PROCNAME : new java.util.Date().toString().substring(0, 10));
+      TaskProcessorHandle tph = (TaskProcessorHandle) v.data();
+      return (tph != null ? tph.getName() : "tph null?"); // todo: for some reason, tph is null!
     }
     
     /**
@@ -362,7 +361,10 @@ public final class NPortal {
      */
     public void executeTaskLocal(Version v) {
       DisplayItem di = DisplayItem.createInstance(taskName(v), "");
-      if (di != null) _taskListModel.addElement(di);
+      if (di == null) return;
+      _taskListModel.addElement(di);
+      _taskList.invalidate();
+      _frame.invalidate();
     }
     
     /**
@@ -370,7 +372,10 @@ public final class NPortal {
      */
     public void completedTaskLocal(Version v) {
       DisplayItem di = DisplayItem.instance(taskName(v), "");
-      if (di != null) di.exited();
+      if (di == null) return;
+      di.exited();
+      _taskList.invalidate();
+      _frame.invalidate();
     }
     
     /**
@@ -378,7 +383,10 @@ public final class NPortal {
      */
     public void stopTaskLocal(Version v) {
       DisplayItem di = DisplayItem.instance(taskName(v), "");
-      if (di != null) di.toKill();
+      if (di == null) return;
+      di.toKill();
+      _taskList.invalidate();
+      _frame.invalidate();
     }
     
     /**
@@ -387,7 +395,10 @@ public final class NPortal {
      */
     public void ignoreResultsOfStoppedTask(Version v) {
       DisplayItem di = DisplayItem.instance(taskName(v), "");
-      if (di != null) di.killed();
+      if (di == null) return;
+      di.killed();
+      _taskList.invalidate();
+      _frame.invalidate();
     }
     
     /**
@@ -396,10 +407,11 @@ public final class NPortal {
      */
     public void replicatingTask(Version v) {
       DisplayItem di = DisplayItem.createInstance(taskName(v), procName(v));
-      if (di != null) {
-        di.replActive();
-        _replListModel.addElement(di);
-      }
+      if (di == null) return;
+      di.replActive();
+      _replListModel.addElement(di);
+      _replList.invalidate();
+      _frame.invalidate();
     }
     
     /**
@@ -408,7 +420,10 @@ public final class NPortal {
      */
     public void doneReplicatingTask(Version v) {
       DisplayItem di = DisplayItem.instance(taskName(v), procName(v));
-      if (di != null) di.replExited();
+      if (di == null) return;
+      di.replExited();
+      _replList.invalidate();
+      _frame.invalidate();
     }
     
     /**
@@ -417,7 +432,10 @@ public final class NPortal {
      */
     public void processorDown(Version v) {
       DisplayItem di = DisplayItem.instance(taskName(v), procName(v));
-      if (di != null) di.replProcDown();
+      if (di == null) return;
+      di.replProcDown();
+      _replList.invalidate();
+      _frame.invalidate();
     }
     
     /**
@@ -427,7 +445,10 @@ public final class NPortal {
      */
     public void taskTimeOut(Version v) {
       DisplayItem di = DisplayItem.instance(taskName(v), procName(v));
-      if (di != null) di.replTimedOut();
+      if (di == null) return;
+      di.replTimedOut();
+      _replList.invalidate();
+      _frame.invalidate();
     }  
 
     // processor capabilities
