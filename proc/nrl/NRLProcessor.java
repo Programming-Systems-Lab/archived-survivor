@@ -92,8 +92,7 @@ public class NRLProcessor extends Processor {
   }
 
   protected Version executeTaskLocal(Version theTask) {
-    // NEED TO INTERACT WITH NRL'S CODE HERE
-
+    // todo: check the semantics of the following statement, jd
     NRLProcessData processData = (NRLProcessData) theTask.data();
 
     // need to get the following from 'taskData'
@@ -108,10 +107,11 @@ public class NRLProcessor extends Processor {
       // left here for backwards compatibility
     }
 
-    NRLProcessData resultDat
+    NRLProcessData resultData
       = (NRLProcessData) _resultDataStorage.get(instanceId.toString());
+
     // todo: check the semantics of the following statement, jd
-    Version result = theTask.split(processData);
+    Version result = theTask.split(resultData);
 
     return result;
   }
