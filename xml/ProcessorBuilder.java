@@ -106,7 +106,7 @@ public class ProcessorBuilder {
     private String _wfDefPath = "";
     private ArrayList _capabilities = new ArrayList();
     private ArrayList _processors = new ArrayList();
-      private Log _log = psl.survivor.ProcessorMain.THELOG;
+    private Log _log = psl.survivor.ProcessorMain.THELOG;
 
     /** CTOR */
     public ProcessorHandler(ProcessorBuilder pm) {

@@ -150,6 +150,7 @@ public abstract class Processor implements Runnable {
     public void addCapability(Object o) {
 	if (!_capabilities.contains(o)) {
 	    _capabilities.add(o);
+	    _log.addedCapability(o);
 	}
     }
 
@@ -239,6 +240,7 @@ public abstract class Processor implements Runnable {
 
 	// execute the task and get the next task
 	Version nextTask = executeTaskLocal(theTask);
+	_log.completedTaskLocal(theTask);
 
 	if (_stoppedTasks.contains(theTask)) {
 	    // this task was supposed to be stopped .. can ignore result

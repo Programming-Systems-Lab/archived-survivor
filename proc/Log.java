@@ -18,6 +18,7 @@ public interface Log {
      * You can get the taskname from that
      */
     public void executeTaskLocal(Version v);
+    public void completedTaskLocal(Version v);
     public void stopTaskLocal(Version v);
     public void ignoreResultsOfStoppedTask(Version v);
 
@@ -30,4 +31,7 @@ public interface Log {
     public void doneReplicatingTask(Version v);
     public void processorDown(Version v);
     public void taskTimeOut(Version v);
+
+    // processor capabilities
+    public void addedCapability(Object o);
 }

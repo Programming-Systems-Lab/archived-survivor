@@ -15,19 +15,19 @@ public class NRLProcessData implements Serializable {
   public String workflowName = null;
 
   /** workflow instance identifier */
-  Object instanceId = null;
+  public Object instanceId = null;
 
   /** identifier for previous task */
-  String originTask = null;
+  public String originTask = null;
 
   /** result state of last task execution */
-  String state = null;
+  public String state = null;
 
   /** identifier for next task */
-  String nextTaskName = null;
+  public String nextTaskName = null;
 
   /** container object for other parameters */
-  Hashtable paramTable = null;
+  public Hashtable paramTable = null;
   
   public String toString() {
     return "NRLProcessData [w:" + workflowName + ",i:" + instanceId + ",o:" + originTask + ",s:" + state + ",n:" + nextTaskName + ",p:" + paramTable + "]";

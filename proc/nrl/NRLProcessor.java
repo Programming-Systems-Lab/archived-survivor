@@ -2,6 +2,7 @@ package psl.survivor.proc.nrl;
 
 import psl.worklets.WVM_Host;
 
+import psl.survivor.proc.Log;
 import psl.survivor.proc.Processor;
 import psl.survivor.proc.TaskDefinition;
 

@@ -14,13 +14,19 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import org.apache.xerces.parsers.SAXParser;
+
+import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.Attributes;
 
 import psl.survivor.xml.ProcessorBuilder;
+
+import psl.survivor.proc.Log;
+import psl.survivor.proc.DefaultLog;
 import psl.survivor.proc.*;
+
+import psl.survivor.demo.NPortal;
 
 /**
  * Used to start a node capabale of running a workflow.
@@ -33,7 +39,7 @@ public class ProcessorMain {
     public static boolean debug = false;
 
     // GSKC THIS IS FOR YOU
-    public static psl.survivor.proc.Log THELOG = null;
+    public static psl.survivor.proc.Log THELOG = new DefaultLog();
 
     /**
      * MAIN
@@ -48,6 +54,7 @@ public class ProcessorMain {
      *             used to communicate to a processor that we want it to
      *             take some action such as starting the workflow.
      * -d d = use debug mode
+     * -g g = use graphical mode
      */
     public static void main(String[] args) {
 	ProcessorBuilder pm = null;
@@ -84,10 +91,15 @@ public class ProcessorMain {
 	    	// DEBUG mode
 		debug = true;
 	    }
+
+	    if (args[i].equals("-g")) {
+	    	// GRAPHICAL mode
+		THELOG = new NPortal(xmlPath).loggerInstance;
+	    }
 	}
 	
 	if (xmlPath == null) { 
-	    System.out.println("usage: java ProcessorMain -f <.xml> -n <rName> -h <rHost> -p <rPort> -l <port> -d <dbg>");
+	    System.out.println("usage: java ProcessorMain -f <.xml> -n <rName> -h <rHost> -p <rPort> -l <port> -d <dbg> -g <gui>");
 	    return;
 	}
 	
